@@ -11,36 +11,41 @@ public class MessageHandlingStrategy<TMessagingClientOptions> : IMessageHandling
     where TMessagingClientOptions: IMessagingClientOptions
 {
     private readonly IMessageHandlerFactory<TMessagingClientOptions> _messageHandlerFactory;
+    private readonly IMessagingContextFactory _messagingContextFactory;
     private readonly ServiceFactory _serviceFactory;
 
     public MessageHandlingStrategy(
         IMessageHandlerFactory<TMessagingClientOptions> messageHandlerFactory, 
-        ServiceFactory serviceFactory)
+        ServiceFactory serviceFactory, 
+        IMessagingContextFactory messagingContextFactory)
     {
         _messageHandlerFactory = messageHandlerFactory;
         _serviceFactory = serviceFactory;
+        _messagingContextFactory = messagingContextFactory;
     }
 
     public async Task<HandlerResult> Handle(IMessage message)
     {
         var handlers = _messageHandlerFactory.GetHandlers(message.Topic, _serviceFactory);
 
-        Task<HandlerResult> HandlerFunc() => HandleInner(handlers, message);
+        var context = _messagingContextFactory.Create(message);
 
-        var messageHandlerDelegate = _serviceFactory
-            .GetInstances<IMessageMiddleware<TMessagingClientOptions>>()
-            .Reverse()
-            .Aggregate((MessageHandlerDelegate)HandlerFunc, 
-                (next, pipeline) => () => pipeline.Handle(message, next));
+        Task<HandlerResult> HandlerFunc() => HandleInner(handlers, context);
 
-        var handlerResult = await messageHandlerDelegate();
+        // var messageHandlerDelegate = _serviceFactory
+        //     .GetInstances<IMessageMiddleware<TMessagingClientOptions>>()
+        //     .Reverse()
+        //     .Aggregate((MessageHandlerDelegate)HandlerFunc, 
+        //         (next, pipeline) => () => pipeline.Handle(message, next));
+
+        var handlerResult = await HandlerFunc();
 
         return handlerResult;
     }
 
-    private async Task<HandlerResult> HandleInner(IEnumerable<IMessageHandler> handlers, IMessage message)
+    private async Task<HandlerResult> HandleInner(IEnumerable<IMessageHandler> handlers, IMessagingContextNew context)
     {
-        var executionResults = await HandleCore(handlers, message);
+        var executionResults = await HandleCore(handlers, context);
 
         var handlerResult = new HandlerResult();
 
@@ -52,13 +57,13 @@ public class MessageHandlingStrategy<TMessagingClientOptions> : IMessageHandling
         return handlerResult;
     }
 
-    protected virtual async Task<IEnumerable<IExecutionResult>> HandleCore(IEnumerable<IMessageHandler> handlers, IMessage message)
+    protected virtual async Task<IEnumerable<IExecutionResult>> HandleCore(IEnumerable<IMessageHandler> handlers, IMessagingContextNew context)
     {
         var executionResults = new List<IExecutionResult>();
 
         foreach (var handler in handlers)
         {
-            var result = await handler.Handle(message);
+            var result = await handler.Handle(context);
             executionResults.Add(result);
         }
 

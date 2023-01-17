@@ -42,11 +42,10 @@ public class MqttReceivedMessageHandlerTests
         
         var contract =  new DeviceMessageContract { Name = "Device" };
         var publishTopic = $"{DeviceTopicConstants.DeviceTopic}/{deviceNumber}";
-        var message = new Message { Topic = publishTopic, Payload = contract.MessagePayloadToJson() };
 
         // act
         var messageBus = serviceProvider.GetRequiredService<IMessageBus<TestMessagingClientOptions>>();
-        await messageBus.Publish(message);
+        await messageBus.Publish(contract, publishTopic);
         var messageReceivedHandler = serviceProvider.GetRequiredService<InMemoryMessageReceivedHandler<TestMessagingClientOptions>>();
         await messageReceivedHandler.HandleApplicationMessageReceivedAsync();
         var result = builder.ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.None);
@@ -72,11 +71,10 @@ public class MqttReceivedMessageHandlerTests
 
         var contract =  new DeviceMessageContract { Name = "Device" };
         var publishTopic = $"{DeviceTopicConstants.DeviceTopic}/{deviceNumberOne}";
-        var message = new Message { Topic = publishTopic, Payload = contract.MessagePayloadToJson() };
 
         // act
         var messageBus = serviceProvider.GetRequiredService<IMessageBus<TestMessagingClientOptions>>();
-        await messageBus.Publish(message);
+        await messageBus.Publish(contract, publishTopic);
         var messageReceivedHandler = serviceProvider.GetRequiredService<InMemoryMessageReceivedHandler<TestMessagingClientOptions>>();
         await messageReceivedHandler.HandleApplicationMessageReceivedAsync();
         var result = builder.ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.None);
@@ -104,11 +102,10 @@ public class MqttReceivedMessageHandlerTests
 
         var contract =  new DeviceMessageContract { Name = "Device" };
         var publishTopic = $"{DeviceTopicConstants.DeviceTopic}/{deviceNumberOne}/temperature";
-        var message = new Message { Topic = publishTopic, Payload = contract.MessagePayloadToJson() };
-        
+
         // act
         var messageBus = serviceProvider.GetRequiredService<IMessageBus<TestMessagingClientOptions>>();
-        await messageBus.Publish(message);
+        await messageBus.Publish(contract, publishTopic);
         var messageReceivedHandler = serviceProvider.GetRequiredService<InMemoryMessageReceivedHandler<TestMessagingClientOptions>>();
         await messageReceivedHandler.HandleApplicationMessageReceivedAsync();
         var result = builder.ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.None);

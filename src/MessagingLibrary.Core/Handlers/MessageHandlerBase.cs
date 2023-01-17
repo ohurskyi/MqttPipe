@@ -1,8 +1,19 @@
 ﻿using MessagingLibrary.Core.Extensions;
+using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
 
 namespace MessagingLibrary.Core.Handlers;
+
+public abstract class MessageHandlerNew<T> : IMessageHandler where T: class, IMessageContract
+{
+    public Task<IExecutionResult> Handle(object ctx)
+    {
+        return HandleAsync((MessagingContextNew<T>)ctx);
+    }
+    
+    protected abstract Task<IExecutionResult> HandleAsync(MessagingContextNew<T> messagingContext);
+}
 
 public abstract class MessageHandlerBase<T> : IMessageHandler
     where T: IMessageContract
@@ -20,4 +31,9 @@ public abstract class MessageHandlerBase<T> : IMessageHandler
     }
     
     protected abstract Task<IExecutionResult> HandleAsync(MessagingContext<T> messagingContext);
+    
+    public Task<IExecutionResult> Handle(object ctx)
+    {
+        throw new NotImplementedException();
+    }
 }

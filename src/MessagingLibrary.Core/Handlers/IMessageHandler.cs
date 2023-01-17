@@ -5,5 +5,5 @@ namespace MessagingLibrary.Core.Handlers;
 
 public interface IMessageHandler
 {
-    Task<IExecutionResult> Handle(IMessage message);
+    Task<IExecutionResult> Handle(object ctx);
 }

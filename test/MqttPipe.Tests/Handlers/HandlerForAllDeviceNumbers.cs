@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
+using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Handlers;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
@@ -7,7 +8,7 @@ using MqttPipe.Tests.Contracts;
 
 namespace MqttPipe.Tests.Handlers;
 
-public class HandlerForAllDeviceNumbers : MessageHandlerBase<DeviceMessageContract>
+public class HandlerForAllDeviceNumbers : MessageHandlerNew<DeviceMessageContract>
 {
     private readonly TextWriter _textWriter;
 
@@ -16,9 +17,9 @@ public class HandlerForAllDeviceNumbers : MessageHandlerBase<DeviceMessageContra
         _textWriter = textWriter;
     }
 
-    protected override async Task<IExecutionResult> HandleAsync(MessagingContext<DeviceMessageContract> messagingContext)
+    protected override async Task<IExecutionResult> HandleAsync(MessagingContextNew<DeviceMessageContract> messagingContext)
     {
-        var payload = messagingContext.Payload;
+        var payload = messagingContext.Message;
         await _textWriter.WriteLineAsync(payload.Name + " " + nameof(HandlerForAllDeviceNumbers));
         return new SuccessfulResult();
     }

@@ -27,4 +27,9 @@ public class ResponseHandler : IMessageHandler
             
         return await Task.FromResult(new SuccessfulResult());
     }
+
+    public Task<IExecutionResult> Handle(object ctx)
+    {
+        throw new NotImplementedException();
+    }
 }

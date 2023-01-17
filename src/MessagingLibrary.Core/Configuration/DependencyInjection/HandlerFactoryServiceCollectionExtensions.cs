@@ -1,4 +1,5 @@
 ﻿using MessagingLibrary.Core.Factory;
+using MessagingLibrary.Core.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -11,6 +12,9 @@ public static class HandlerFactoryServiceCollectionExtensions
     {
         serviceCollection.AddRequiredServiceResolvingFactory();
         serviceCollection.TryAddSingleton<IMessageHandlerFactory<TMessagingClientOptions>, MessageHandlerFactory<TMessagingClientOptions>>();
+
+        serviceCollection.TryAddSingleton<IMessagingContextFactory, MessagingContextFactory>();
+        serviceCollection.TryAddSingleton<IMessageSerializer, MessageSerializer>();
         return serviceCollection;
     }
 
