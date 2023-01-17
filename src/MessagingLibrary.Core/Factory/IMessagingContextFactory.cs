@@ -5,17 +5,20 @@ namespace MessagingLibrary.Core.Factory;
 
 public interface IMessagingContextNew
 {
-    
+    public string Topic { get; }
 }
 
 public class MessagingContextNew<T> : IMessagingContextNew where T: class, IMessageContract
 {
-    public MessagingContextNew(T message)
+    public MessagingContextNew(T message, string topic)
     {
         Message = message;
+        Topic = topic;
     }
 
     public T Message { get; }
+
+    public string Topic { get; }
 }
 
 public interface IMessagingContextFactory
@@ -36,7 +39,7 @@ public class MessagingContextFactory : IMessagingContextFactory
     {
         var msg = _messageSerializer.Deserialize(message.Payload);
         var constructedType = typeof(MessagingContextNew<>).MakeGenericType(msg.GetType());
-        var instance = (IMessagingContextNew)Activator.CreateInstance(constructedType, msg);
+        var instance = (IMessagingContextNew)Activator.CreateInstance(constructedType, msg, message.Topic);
         return instance;
     }
 }

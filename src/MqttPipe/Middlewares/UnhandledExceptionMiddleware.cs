@@ -1,4 +1,5 @@
 ﻿using MessagingLibrary.Core.Configuration;
+using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
 using MessagingLibrary.Processing.Middlewares;
@@ -16,7 +17,7 @@ public class UnhandledExceptionMiddleware<TMessagingClientOptions> : IMessageMid
         _logger = logger;
     }
 
-    public async Task<HandlerResult> Handle(IMessage message, MessageHandlerDelegate next)
+    public async Task<HandlerResult> Handle(IMessagingContextNew context, MessageHandlerDelegate next)
     {
         try
         {
@@ -24,7 +25,7 @@ public class UnhandledExceptionMiddleware<TMessagingClientOptions> : IMessageMid
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Unhandled Exception while processing message on topic {topicValue}", message.Topic);
+            _logger.LogError(e, "Unhandled Exception while processing message on topic {topicValue}", context.Topic);
             throw;
         }
     }

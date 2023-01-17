@@ -32,13 +32,13 @@ public class MessageHandlingStrategy<TMessagingClientOptions> : IMessageHandling
 
         Task<HandlerResult> HandlerFunc() => HandleInner(handlers, context);
 
-        // var messageHandlerDelegate = _serviceFactory
-        //     .GetInstances<IMessageMiddleware<TMessagingClientOptions>>()
-        //     .Reverse()
-        //     .Aggregate((MessageHandlerDelegate)HandlerFunc, 
-        //         (next, pipeline) => () => pipeline.Handle(message, next));
+        var messageHandlerDelegate = _serviceFactory
+            .GetInstances<IMessageMiddleware<TMessagingClientOptions>>()
+            .Reverse()
+            .Aggregate((MessageHandlerDelegate)HandlerFunc, 
+                (next, pipeline) => () => pipeline.Handle(context, next));
 
-        var handlerResult = await HandlerFunc();
+        var handlerResult = await messageHandlerDelegate();
 
         return handlerResult;
     }

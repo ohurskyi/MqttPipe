@@ -1,4 +1,5 @@
 ﻿using MessagingLibrary.Core.Configuration;
+using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
 
@@ -8,5 +9,5 @@ public delegate Task<HandlerResult> MessageHandlerDelegate();
 
 public interface IMessageMiddleware<TMessagingClientOptions> where TMessagingClientOptions : IMessagingClientOptions
 {
-    Task<HandlerResult> Handle(IMessage message, MessageHandlerDelegate next);
+    Task<HandlerResult> Handle(IMessagingContextNew context, MessageHandlerDelegate next);
 }

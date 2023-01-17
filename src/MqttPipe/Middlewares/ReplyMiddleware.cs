@@ -1,6 +1,7 @@
 ﻿using MessagingLibrary.Core.Clients;
 using MessagingLibrary.Core.Configuration;
 using MessagingLibrary.Core.Extensions;
+using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
 using MessagingLibrary.Processing.Middlewares;
@@ -21,7 +22,7 @@ public class ReplyMiddleware<TMessagingClientOptions> : IMessageMiddleware<TMess
         _messageBus = messageBus;
     }
 
-    public async Task<HandlerResult> Handle(IMessage message, MessageHandlerDelegate next)
+    public async Task<HandlerResult> Handle(IMessagingContextNew context, MessageHandlerDelegate next)
     {
         var result = await next();
         var replyResults = result.ExecutionResults.OfType<ReplyResult>().ToList();
