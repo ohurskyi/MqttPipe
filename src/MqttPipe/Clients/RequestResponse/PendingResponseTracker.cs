@@ -3,18 +3,18 @@ using MessagingLibrary.Core.Messages;
 
 namespace MqttPipe.Clients.RequestResponse;
 
-public class PendingResponseTracker
+public class PendingResponseTracker<T> where T : class, IMessageContract
 {
-    private readonly ConcurrentDictionary<Guid, TaskCompletionSource<IMessageContract>> _completionSources = new();
+    private readonly ConcurrentDictionary<Guid, TaskCompletionSource<T>> _completionSources = new();
     
-    public Task<IMessageContract> AddCompletion(Guid correlationId)
+    public Task<T> AddCompletion(Guid correlationId)
     {
-        var tcs = new TaskCompletionSource<IMessageContract>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var tcs = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
         _completionSources.TryAdd(correlationId, tcs);
         return tcs.Task;
     }
     
-    public TaskCompletionSource<IMessageContract> GetCompletion(Guid correlationId)
+    public TaskCompletionSource<T> GetCompletion(Guid correlationId)
     {
         return _completionSources.TryGetValue(correlationId, out var completionSource) ? completionSource : null;
     }

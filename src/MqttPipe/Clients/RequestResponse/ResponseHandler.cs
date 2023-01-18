@@ -1,28 +1,21 @@
 ﻿using MessagingLibrary.Core.Contexts;
-using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Handlers;
+using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
 
 namespace MqttPipe.Clients.RequestResponse.Handlers;
 
-public class ResponseHandler : IMessageHandler
+public class ResponseHandler<T> : MessageHandler<T> where T: class, IMessageResponse
 {
-    private readonly PendingResponseTracker _pendingResponseTracker;
+    private readonly PendingResponseTracker<T> _pendingResponseTracker;
 
-    public ResponseHandler(PendingResponseTracker pendingResponseTracker)
+    public ResponseHandler(PendingResponseTracker<T> pendingResponseTracker)
     {
         _pendingResponseTracker = pendingResponseTracker;
     }
 
-    public async Task<IExecutionResult> Handle(object ctx)
+    protected override async Task<IExecutionResult> HandleAsync(MessagingContext<T> messagingContext)
     {
-        var messagingContext = ctx as MessagingContext;
-
-        if (messagingContext == null)
-        {
-            return await Task.FromResult(FailedResult.Create("Cannot restore messaging context."));
-        }
-        
         var taskCompletionSource = _pendingResponseTracker.GetCompletion(messagingContext.CorrelationId);
 
         if (taskCompletionSource == null)

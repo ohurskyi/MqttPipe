@@ -1,5 +1,4 @@
 ﻿using MessagingLibrary.Core.Contexts;
-using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
 
@@ -11,6 +10,6 @@ public abstract class MessageHandler<T> : IMessageHandler where T: class, IMessa
     {
         return HandleAsync((MessagingContext<T>)ctx);
     }
-    
+
     protected abstract Task<IExecutionResult> HandleAsync(MessagingContext<T> messagingContext);
 }

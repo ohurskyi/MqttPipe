@@ -27,8 +27,9 @@ public static class MessageClientServiceCollectionExtensions
     public static IServiceCollection AddMqttRequestClient<TMessagingClientOptions>(this IServiceCollection serviceCollection) 
         where TMessagingClientOptions: class, IMqttMessagingClientOptions
     {
-        serviceCollection.TryAddSingleton<PendingResponseTracker>();
-        serviceCollection.AddMessageHandler<ResponseHandler>();
+        serviceCollection.TryAddSingleton(typeof(PendingResponseTracker<>));
+        serviceCollection.TryAddTransient(typeof(Requester<,,>));
+        serviceCollection.TryAddTransient(typeof(ResponseHandler<>));
         serviceCollection.TryAddSingleton<IRequestClient<TMessagingClientOptions>, RequestClient<TMessagingClientOptions>>();
         return serviceCollection;
     }
