@@ -2,6 +2,6 @@
 
 public interface IResponseContext
 {
-    string ReplyTopic { get; set; }
-    Guid CorrelationId { get; set; }
+    string ReplyTopic { get; }
+    Guid CorrelationId { get; }
 }

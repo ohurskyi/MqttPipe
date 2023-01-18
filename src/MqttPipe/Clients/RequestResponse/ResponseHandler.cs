@@ -1,7 +1,6 @@
-﻿using MessagingLibrary.Core.Handlers;
-using MessagingLibrary.Core.Messages;
+﻿using MessagingLibrary.Core.Factory;
+using MessagingLibrary.Core.Handlers;
 using MessagingLibrary.Core.Results;
-using MqttPipe.Clients.RequestResponse.Completion;
 
 namespace MqttPipe.Clients.RequestResponse.Handlers;
 
@@ -14,22 +13,24 @@ public class ResponseHandler : IMessageHandler
         _pendingResponseTracker = pendingResponseTracker;
     }
 
-    public async Task<IExecutionResult> Handle(IMessage message)
+    public async Task<IExecutionResult> Handle(object ctx)
     {
-        var taskCompletionSource = _pendingResponseTracker.GetCompletion(message.CorrelationId);
+        var messagingContext = ctx as IMessagingContextNew;
+
+        if (messagingContext == null)
+        {
+            return await Task.FromResult(FailedResult.Create("Cannot restore messaging context."));
+        }
+        
+        var taskCompletionSource = _pendingResponseTracker.GetCompletion(messagingContext.CorrelationId);
 
         if (taskCompletionSource == null)
         {
-            return await Task.FromResult(FailedResult.Create($"Cannot complete the response. Non existing correlation id {message.CorrelationId}"));
+            return await Task.FromResult(FailedResult.Create($"Cannot complete the response. Non existing correlation id {messagingContext.CorrelationId}"));
         }
 
-        taskCompletionSource.SetResult(message.Payload);
+        taskCompletionSource.TrySetResult(messagingContext.Message);
             
         return await Task.FromResult(new SuccessfulResult());
-    }
-
-    public Task<IExecutionResult> Handle(object ctx)
-    {
-        throw new NotImplementedException();
     }
 }

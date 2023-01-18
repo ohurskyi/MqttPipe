@@ -26,7 +26,7 @@ public class GetTargetLayersMessageHandler : MessageHandlerNew<GetTargetLayersRe
         _logger.LogInformation("Getting target layers on lane {value}", laneNumber);
         var layers = _targetLayersStorage.GetTargetLayers(laneNumber);
         var response = new GetTargetLayersResponse { Layers = layers.Select(s => s.Layer).ToList() };
-        //var result = new ReplyResult(response, messagingContext);
-        return await Task.FromResult(new SuccessfulResult());
+        var result = new ReplyResult(response, messagingContext);
+        return await Task.FromResult(result);
     }
 }

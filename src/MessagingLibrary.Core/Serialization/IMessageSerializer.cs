@@ -7,8 +7,8 @@ namespace MessagingLibrary.Core.Serialization;
 public interface IMessageSerializer
 {
     string Serialize(IMessageContract messageContract);
-    
     IMessageContract Deserialize(string payload);
+    T Deserialize<T>(string payload) where T : IMessageContract;
 }
 
 public class MessageSerializer : IMessageSerializer
@@ -27,5 +27,10 @@ public class MessageSerializer : IMessageSerializer
     public IMessageContract Deserialize(string payload)
     {
         return (IMessageContract)JsonConvert.DeserializeObject(payload, _serializerSettings);
+    }
+    
+    public T Deserialize<T>(string payload) where T: IMessageContract
+    {
+        return JsonConvert.DeserializeObject<T>(payload, _serializerSettings);
     }
 }
