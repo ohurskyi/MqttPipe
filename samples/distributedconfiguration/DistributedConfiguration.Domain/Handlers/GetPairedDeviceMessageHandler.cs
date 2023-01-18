@@ -1,12 +1,13 @@
 ﻿using DistributedConfiguration.Contracts.Pairing;
+using MessagingLibrary.Core.Contexts;
+using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Handlers;
-using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
 using Microsoft.Extensions.Logging;
 
 namespace DistributedConfiguration.Domain.Handlers;
 
-public class GetPairedDeviceMessageHandler : MessageHandlerBase<GetPairedDeviceContract>
+public class GetPairedDeviceMessageHandler : MessageHandler<GetPairedDeviceContract>
 {
     private readonly ILogger<PairDeviceMessageHandler> _logger;
 
@@ -17,7 +18,7 @@ public class GetPairedDeviceMessageHandler : MessageHandlerBase<GetPairedDeviceC
 
     protected override async Task<IExecutionResult> HandleAsync(MessagingContext<GetPairedDeviceContract> messagingContext)
     {
-        var payload = messagingContext.Payload;
+        var payload = messagingContext.Message;
         
         _logger.LogInformation("Get device with id {value}", payload.DeviceId);
 

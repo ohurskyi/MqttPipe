@@ -1,4 +1,5 @@
-﻿using MessagingLibrary.Core.Factory;
+﻿using MessagingLibrary.Core.Contexts;
+using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Handlers;
 using MessagingLibrary.Core.Results;
 
@@ -15,7 +16,7 @@ public class ResponseHandler : IMessageHandler
 
     public async Task<IExecutionResult> Handle(object ctx)
     {
-        var messagingContext = ctx as IMessagingContextNew;
+        var messagingContext = ctx as MessagingContext;
 
         if (messagingContext == null)
         {

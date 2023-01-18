@@ -1,4 +1,5 @@
 ﻿using MessagingLibrary.Core.Configuration;
+using MessagingLibrary.Core.Contexts;
 using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Handlers;
 using MessagingLibrary.Core.Messages;
@@ -43,7 +44,7 @@ public class MessageHandlingStrategy<TMessagingClientOptions> : IMessageHandling
         return handlerResult;
     }
 
-    private async Task<HandlerResult> HandleInner(IEnumerable<IMessageHandler> handlers, IMessagingContextNew context)
+    private async Task<HandlerResult> HandleInner(IEnumerable<IMessageHandler> handlers, MessagingContext context)
     {
         var executionResults = await HandleCore(handlers, context);
 
@@ -57,7 +58,7 @@ public class MessageHandlingStrategy<TMessagingClientOptions> : IMessageHandling
         return handlerResult;
     }
 
-    protected virtual async Task<IEnumerable<IExecutionResult>> HandleCore(IEnumerable<IMessageHandler> handlers, IMessagingContextNew context)
+    protected virtual async Task<IEnumerable<IExecutionResult>> HandleCore(IEnumerable<IMessageHandler> handlers, MessagingContext context)
     {
         var executionResults = new List<IExecutionResult>();
 

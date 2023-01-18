@@ -1,5 +1,6 @@
 ﻿using MessagingLibrary.Core.Clients;
 using MessagingLibrary.Core.Configuration;
+using MessagingLibrary.Core.Contexts;
 using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
@@ -20,7 +21,7 @@ public class PublishMiddleware<TMessagingClientOptions> : IMessageMiddleware<TMe
         _messageBus = messageBus;
     }
 
-    public async Task<HandlerResult> Handle(IMessagingContextNew context, MessageHandlerDelegate next)
+    public async Task<HandlerResult> Handle(MessagingContext context, MessageHandlerDelegate next)
     {
         var result = await next();
         var integrationEvents = result.ExecutionResults.OfType<IntegrationEventResult>().ToList();

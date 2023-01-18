@@ -1,6 +1,6 @@
-﻿using MessagingLibrary.Core.Factory;
+﻿using MessagingLibrary.Core.Contexts;
+using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Handlers;
-using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
 using Microsoft.Extensions.Logging;
 using Shooting.Contracts.TargetLayers;
@@ -8,7 +8,7 @@ using Shooting.Domain.Infrastructure;
 
 namespace Shooting.Domain.Handlers.GetTargetLayers;
 
-public class GetTargetLayersMessageHandler : MessageHandlerNew<GetTargetLayersRequest>
+public class GetTargetLayersMessageHandler : MessageHandler<GetTargetLayersRequest>
 {
     private readonly TargetLayersStorage _targetLayersStorage;
     private readonly ILogger<GetTargetLayersMessageHandler> _logger;
@@ -19,7 +19,7 @@ public class GetTargetLayersMessageHandler : MessageHandlerNew<GetTargetLayersRe
         _logger = logger;
     }
 
-    protected override async Task<IExecutionResult> HandleAsync(MessagingContextNew<GetTargetLayersRequest> messagingContext)
+    protected override async Task<IExecutionResult> HandleAsync(MessagingContext<GetTargetLayersRequest> messagingContext)
     {
         var payload = messagingContext.Message;
         var laneNumber = payload.LaneNumber;

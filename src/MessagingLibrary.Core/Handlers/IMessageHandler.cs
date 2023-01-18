@@ -1,5 +1,4 @@
-﻿using MessagingLibrary.Core.Messages;
-using MessagingLibrary.Core.Results;
+﻿using MessagingLibrary.Core.Results;
 
 namespace MessagingLibrary.Core.Handlers;
 
