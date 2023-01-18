@@ -2,7 +2,6 @@
 using MessagingLibrary.Core.Contexts;
 using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Handlers;
-using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
 using MessagingLibrary.Processing.Middlewares;
 
@@ -12,32 +11,27 @@ public class MessageHandlingStrategy<TMessagingClientOptions> : IMessageHandling
     where TMessagingClientOptions: IMessagingClientOptions
 {
     private readonly IMessageHandlerFactory<TMessagingClientOptions> _messageHandlerFactory;
-    private readonly IMessagingContextFactory _messagingContextFactory;
     private readonly ServiceFactory _serviceFactory;
 
     public MessageHandlingStrategy(
         IMessageHandlerFactory<TMessagingClientOptions> messageHandlerFactory, 
-        ServiceFactory serviceFactory, 
-        IMessagingContextFactory messagingContextFactory)
+        ServiceFactory serviceFactory)
     {
         _messageHandlerFactory = messageHandlerFactory;
         _serviceFactory = serviceFactory;
-        _messagingContextFactory = messagingContextFactory;
     }
 
-    public async Task<HandlerResult> Handle(IMessage message)
+    public async Task<HandlerResult> Handle(MessagingContext messagingContext)
     {
-        var handlers = _messageHandlerFactory.GetHandlers(message.Topic, _serviceFactory);
+        var handlers = _messageHandlerFactory.GetHandlers(messagingContext.Topic, _serviceFactory);
 
-        var context = _messagingContextFactory.Create(message);
-
-        Task<HandlerResult> HandlerFunc() => HandleInner(handlers, context);
+        Task<HandlerResult> HandlerFunc() => HandleInner(handlers, messagingContext);
 
         var messageHandlerDelegate = _serviceFactory
             .GetInstances<IMessageMiddleware<TMessagingClientOptions>>()
             .Reverse()
             .Aggregate((MessageHandlerDelegate)HandlerFunc, 
-                (next, pipeline) => () => pipeline.Handle(context, next));
+                (next, pipeline) => () => pipeline.Handle(messagingContext, next));
 
         var handlerResult = await messageHandlerDelegate();
 

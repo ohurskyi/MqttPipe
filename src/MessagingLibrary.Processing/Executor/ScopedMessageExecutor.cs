@@ -1,4 +1,5 @@
 using MessagingLibrary.Core.Configuration;
+using MessagingLibrary.Core.Contexts;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Processing.Strategy;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +20,9 @@ namespace MessagingLibrary.Processing.Executor
         {
             using var scope = _serviceScopeFactory.CreateScope();
             var messageHandlingStrategy = scope.ServiceProvider.GetRequiredService<IMessageHandlingStrategy<TMessagingClientOptions>>();
-            await messageHandlingStrategy.Handle(message);
+            var messagingContextFactory = scope.ServiceProvider.GetRequiredService<IMessagingContextFactory>();
+            var context = messagingContextFactory.Create(message);
+            await messageHandlingStrategy.Handle(context);
         }
     }
 }

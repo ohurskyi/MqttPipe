@@ -14,9 +14,15 @@ public static class HandlerFactoryServiceCollectionExtensions
         serviceCollection.AddRequiredServiceResolvingFactory();
         serviceCollection.TryAddSingleton<IMessageHandlerFactory<TMessagingClientOptions>, MessageHandlerFactory<TMessagingClientOptions>>();
 
-        serviceCollection.TryAddSingleton<IMessagingContextFactory, MessagingContextFactory>();
-        serviceCollection.TryAddSingleton<IMessageSerializer, MessageSerializer>();
+        Move<TMessagingClientOptions>(serviceCollection);
         return serviceCollection;
+    }
+
+    private static void Move<TMessagingClientOptions>(IServiceCollection serviceCollection)
+        where TMessagingClientOptions : IMessagingClientOptions
+    {
+        serviceCollection.TryAddTransient<IMessagingContextFactory, MessagingContextFactory>();
+        serviceCollection.TryAddSingleton<IMessageSerializer, MessageSerializer>();
     }
 
     private static IServiceCollection AddRequiredServiceResolvingFactory(this IServiceCollection serviceCollection)
