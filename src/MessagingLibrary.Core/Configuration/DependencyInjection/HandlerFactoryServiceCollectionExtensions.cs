@@ -23,6 +23,7 @@ public static class HandlerFactoryServiceCollectionExtensions
     {
         serviceCollection.TryAddTransient<IMessagingContextFactory, MessagingContextFactory>();
         serviceCollection.TryAddSingleton<IMessageSerializer, MessageSerializer>();
+        serviceCollection.TryAddSingleton<IContractsProvider, ContractsProvider>();
     }
 
     private static IServiceCollection AddRequiredServiceResolvingFactory(this IServiceCollection serviceCollection)
