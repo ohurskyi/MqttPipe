@@ -1,3 +1,4 @@
+using System.Runtime.Serialization;
 using MessagingLibrary.Core.Messages;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -37,7 +38,15 @@ public class MessageSerializer : IMessageSerializer
 
     public IMessageContract Deserialize(string payload)
     {
-        return (IMessageContract)JsonConvert.DeserializeObject(payload, _serializerSettings);
+        try
+        {
+            var contract = (IMessageContract)JsonConvert.DeserializeObject(payload, _serializerSettings);
+            return contract;
+        }
+        catch (JsonSerializationException ex)
+        {
+            throw new SerializationException($"Message can not be deserialized. Payload: {payload}", ex);
+        }
     }
     
     public T Deserialize<T>(string payload) where T: IMessageContract

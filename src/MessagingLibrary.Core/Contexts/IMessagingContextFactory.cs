@@ -4,5 +4,5 @@ namespace MessagingLibrary.Core.Contexts;
 
 public interface IMessagingContextFactory
 {
-    MessagingContext Create(IMessage message);
+    bool TryGetContext(IMessage message, out MessagingContext messagingContext);
 }
