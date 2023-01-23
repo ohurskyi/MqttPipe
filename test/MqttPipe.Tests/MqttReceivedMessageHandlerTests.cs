@@ -128,7 +128,7 @@ public class MqttReceivedMessageHandlerTests
         serviceCollection.AddSingleton<ITopicClient<TestMessagingClientOptions>, InMemoryTopicClient<TestMessagingClientOptions>>();
         serviceCollection.AddMessagingPipeline<TestMessagingClientOptions>();
         serviceCollection.AddMqttTopicComparer();
-        serviceCollection.AddMessageHandlersNew(typeof(HandlerForDeviceNumber1).Assembly);
+        serviceCollection.AddMessageHandlers(typeof(HandlerForDeviceNumber1).Assembly);
         
         return serviceCollection.BuildServiceProvider();
     }

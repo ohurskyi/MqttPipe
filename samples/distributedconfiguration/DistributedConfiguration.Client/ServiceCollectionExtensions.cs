@@ -10,8 +10,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddDomainServices(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddMessageHandlerNew<DevicesConfigurationChangedContract, UpdateLocalConfigurationMessageHandler>();
-        serviceCollection.AddMessageHandlerNew<DevicesConfigurationChangedContract, NotifyUsersMessageHandler>();
+        serviceCollection.AddMessageHandler<UpdateLocalConfigurationMessageHandler>();
+        serviceCollection.AddMessageHandler<NotifyUsersMessageHandler>();
         serviceCollection.AddConsumerDefinitionListenerProvider<ConsumerDefinitionListenerProvider>();
         serviceCollection.AddMessageConsumersHostedService();
         return serviceCollection;

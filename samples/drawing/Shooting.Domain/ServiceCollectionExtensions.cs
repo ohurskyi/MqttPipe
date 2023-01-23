@@ -18,7 +18,7 @@ public static class ServiceCollectionExtensions
         // add explicit
         // todo how to scan open generics
        // serviceCollection.AddTransient<CreateTargetLayerMessageHandler>();
-       serviceCollection.AddMessageHandlersNew(typeof(CreateTargetLayerMessageHandler).Assembly);
+       serviceCollection.AddMessageHandlers(typeof(CreateTargetLayerMessageHandler).Assembly);
         serviceCollection.AddConsumerDefinitionListenerProvider<ConsumerDefinitionListenerProvider>();
         serviceCollection.AddMessageConsumersHostedService();
 
