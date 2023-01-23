@@ -32,7 +32,7 @@ public class Requester<TMessagingClientOptions, TMessageRequest, TMessageRespons
     {
         var correlationId = Guid.NewGuid();
         var replyTopic = $"{responseTopic}/{correlationId}";
-        var subscription = new SubscriptionDefinition<TMessageResponse, ResponseHandler<TMessageResponse>>(replyTopic);
+        var subscription = new SubscriptionDefinition<ResponseHandler<TMessageResponse>>(replyTopic);
         await _mqttTopicClient.Subscribe(subscription);
         
         try

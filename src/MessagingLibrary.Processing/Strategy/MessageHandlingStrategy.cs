@@ -43,13 +43,7 @@ public class MessageHandlingStrategy<TMessagingClientOptions> : IMessageHandling
     protected virtual async Task<IEnumerable<IExecutionResult>> HandleCore(IEnumerable<IMessageHandler> handlers, MessagingContext context)
     {
         var executionResults = new List<IExecutionResult>();
-
-        foreach (var handler in handlers)
-        {
-            var result = await handler.Handle(context);
-            executionResults.Add(result);
-        }
-
+        
         return executionResults;
     }
 }

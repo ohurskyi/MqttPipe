@@ -1,11 +1,9 @@
 ﻿using MessagingLibrary.Core.Handlers;
-using MessagingLibrary.Core.Messages;
 
 namespace MessagingLibrary.Core.Definitions.Subscriptions;
 
-public class SubscriptionDefinition<TMessage, THandler> : ISubscriptionDefinition 
-    where TMessage: class, IMessageContract
-    where THandler: IMessageHandlerGeneric<TMessage>
+public class SubscriptionDefinition<THandler> : ISubscriptionDefinition
+    where THandler: IMessageHandler
 {
     public SubscriptionDefinition(string topic)
     {

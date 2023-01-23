@@ -1,5 +1,4 @@
-﻿using DistributedConfiguration.Contracts.Pairing;
-using DistributedConfiguration.Contracts.Topics;
+﻿using DistributedConfiguration.Contracts.Topics;
 using DistributedConfiguration.Domain.Handlers;
 using MessagingLibrary.Core.Definitions.Consumers;
 using MessagingLibrary.Core.Definitions.Subscriptions;
@@ -12,8 +11,8 @@ public class DevicePairingConsumerDefinition : IConsumerDefinition
     {
         return new List<ISubscriptionDefinition>
         {
-            new SubscriptionDefinition<PairDeviceContract, PairDeviceMessageHandler>($"{DistributedConfigurationTopicConstants.PairDevice}"),
-            new SubscriptionDefinition<GetPairedDeviceContract, GetPairedDeviceMessageHandler>($"{DistributedConfigurationTopicConstants.RequestUpdate}")
+            new SubscriptionDefinition<PairDeviceMessageHandler>($"{DistributedConfigurationTopicConstants.PairDevice}"),
+            new SubscriptionDefinition<GetPairedDeviceMessageHandler>($"{DistributedConfigurationTopicConstants.RequestUpdate}")
         };
     }
 }
