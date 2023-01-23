@@ -18,14 +18,6 @@ namespace MessagingLibrary.Processing.Executor
 
         public async Task ExecuteAsync(IMessage message)
         {
-            // using var scope = _serviceScopeFactory.CreateScope();
-            // var messagingContextFactory = scope.ServiceProvider.GetRequiredService<IMessagingContextFactory>();
-            // if (messagingContextFactory.TryGetContext(message, out var context))
-            // {
-            //     var messageHandlingStrategy = scope.ServiceProvider.GetRequiredService<IMessageHandlingStrategy<TMessagingClientOptions>>();
-            //     await messageHandlingStrategy.Handle(context);
-            // }
-
             await ExecuteAsyncNew(message);
         }
 

@@ -34,13 +34,10 @@ public class MessageHandlingStrategyGeneric<T> : MessageHandlingStrategyGenericB
     {
         var factory = _serviceFactory.GetInstance<IMessageHandlerFactory<TMessagingClientOptions>>();
         
-        var handlers = factory.GetHandlersNew<T>(messagingContext.Topic, _serviceFactory);
+        var handlers = factory.GetHandlers<T>(messagingContext.Topic, _serviceFactory);
         
         Task<HandlerResult> HandlerFunc() => HandleCore(messagingContext, handlers);
 
-        var test = _serviceFactory
-            .GetInstances<IMessageMiddlewareGeneric<T>>().ToList();
-        
         var middlewares = _serviceFactory
             .GetInstances<IMessageMiddlewareGeneric<T>>()
             .Reverse()

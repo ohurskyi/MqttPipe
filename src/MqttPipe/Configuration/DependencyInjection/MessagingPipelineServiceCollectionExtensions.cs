@@ -24,10 +24,15 @@ public static class MessagingPipelineServiceCollectionExtensions
 
     public static IServiceCollection AddMiddlewaresNew(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddTransient(typeof(IMessageMiddlewareGeneric<>),
-            typeof(LoggingMiddlewareGeneric<>));
-        serviceCollection.AddTransient(typeof(IMessageMiddlewareGeneric<>),
-            typeof(PublishMiddlewareGeneric<>));
+        serviceCollection.TryAddEnumerable(new[]
+        {
+            ServiceDescriptor.Transient(typeof(IMessageMiddlewareGeneric<>),
+                typeof(UnhandledExceptionMiddlewareGeneric<>)),
+            ServiceDescriptor.Transient(typeof(IMessageMiddlewareGeneric<>), typeof(LoggingMiddlewareGeneric<>)),
+            ServiceDescriptor.Transient(typeof(IMessageMiddlewareGeneric<>), typeof(PublishMiddlewareGeneric<>)),
+            ServiceDescriptor.Transient(typeof(IMessageMiddlewareGeneric<>), typeof(ReplyMiddlewareGeneric<>)),
+        });
+        
         return serviceCollection;
     }
 

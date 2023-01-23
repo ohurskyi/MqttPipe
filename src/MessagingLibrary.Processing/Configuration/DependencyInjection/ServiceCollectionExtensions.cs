@@ -22,8 +22,6 @@ public static class ServiceCollectionExtensions
         where TMessagingClientOptions: class, IMessagingClientOptions
     {
         serviceCollection.AddMessageHandlerFactory<TMessagingClientOptions>();
-
-        serviceCollection.TryAddTransient<IMessageHandlingStrategy<TMessagingClientOptions>, MessageHandlingStrategy<TMessagingClientOptions>>();
         
         serviceCollection.TryAddSingleton<IMessageExecutor<TMessagingClientOptions>, ScopedMessageExecutor<TMessagingClientOptions>>();
         

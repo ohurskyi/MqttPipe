@@ -23,19 +23,7 @@ public class MessageHandlingStrategy<TMessagingClientOptions> : IMessageHandling
 
     public async Task<HandlerResult> Handle(MessagingContext messagingContext)
     {
-        var handlers = _messageHandlerFactory.GetHandlers(messagingContext.Topic, _serviceFactory);
-
-        Task<HandlerResult> HandlerFunc() => HandleInner(handlers, messagingContext);
-
-        var messageHandlerDelegate = _serviceFactory
-            .GetInstances<IMessageMiddleware<TMessagingClientOptions>>()
-            .Reverse()
-            .Aggregate((MessageHandlerDelegate)HandlerFunc, 
-                (next, pipeline) => () => pipeline.Handle(messagingContext, next));
-
-        var handlerResult = await messageHandlerDelegate();
-
-        return handlerResult;
+        return new HandlerResult();
     }
 
     private async Task<HandlerResult> HandleInner(IEnumerable<IMessageHandler> handlers, MessagingContext context)
