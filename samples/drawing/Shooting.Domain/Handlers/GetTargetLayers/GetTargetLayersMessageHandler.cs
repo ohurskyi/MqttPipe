@@ -8,7 +8,7 @@ using Shooting.Domain.Infrastructure;
 
 namespace Shooting.Domain.Handlers.GetTargetLayers;
 
-public class GetTargetLayersMessageHandler : MessageHandler<GetTargetLayersRequest>
+public class GetTargetLayersMessageHandler : IMessageHandlerGeneric<GetTargetLayersRequest>
 {
     private readonly TargetLayersStorage _targetLayersStorage;
     private readonly ILogger<GetTargetLayersMessageHandler> _logger;
@@ -19,7 +19,7 @@ public class GetTargetLayersMessageHandler : MessageHandler<GetTargetLayersReque
         _logger = logger;
     }
 
-    public override async Task<IExecutionResult> HandleAsync(MessagingContext<GetTargetLayersRequest> messagingContext)
+    public async Task<IExecutionResult> HandleAsync(MessagingContext<GetTargetLayersRequest> messagingContext)
     {
         var payload = messagingContext.Message;
         var laneNumber = payload.LaneNumber;

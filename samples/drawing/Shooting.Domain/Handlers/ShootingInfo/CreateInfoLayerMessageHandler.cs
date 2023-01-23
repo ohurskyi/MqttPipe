@@ -12,7 +12,7 @@ using Shooting.Domain.Models;
 
 namespace Shooting.Domain.Handlers.ShootingInfo;
 
-public class CreateInfoLayerMessageHandler : MessageHandler<ShootingInfoContract>
+public class CreateInfoLayerMessageHandler : IMessageHandlerGeneric<ShootingInfoContract>
 {
     private readonly ILogger<CreateInfoLayerMessageHandler> _logger;
     private readonly IMediator _mediator;
@@ -23,7 +23,7 @@ public class CreateInfoLayerMessageHandler : MessageHandler<ShootingInfoContract
         _mediator = mediator;
     }
 
-    public override async Task<IExecutionResult> HandleAsync(MessagingContext<ShootingInfoContract> messagingContext)
+    public async Task<IExecutionResult> HandleAsync(MessagingContext<ShootingInfoContract> messagingContext)
     {
         var payload = messagingContext.Message;
         await Task.Delay(TimeSpan.FromMilliseconds(Random.Shared.Next(700, 1400)));

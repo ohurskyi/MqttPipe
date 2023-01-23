@@ -5,7 +5,7 @@ namespace MessagingLibrary.Core.Definitions.Subscriptions;
 
 public class SubscriptionDefinition<TMessage, THandler> : ISubscriptionDefinition 
     where TMessage: class, IMessageContract
-    where THandler: MessageHandler<TMessage>
+    where THandler: IMessageHandlerGeneric<TMessage>
 {
     public SubscriptionDefinition(string topic)
     {

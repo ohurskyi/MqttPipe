@@ -3,9 +3,9 @@ using MessagingLibrary.Core.Handlers;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
 
-namespace MqttPipe.Clients.RequestResponse.Handlers;
+namespace MqttPipe.Clients.RequestResponse;
 
-public class ResponseHandler<T> : MessageHandler<T> where T: class, IMessageResponse
+public class ResponseHandler<T> : IMessageHandlerGeneric<T> where T: class, IMessageResponse
 {
     private readonly PendingResponseTracker<T> _pendingResponseTracker;
 
@@ -14,7 +14,7 @@ public class ResponseHandler<T> : MessageHandler<T> where T: class, IMessageResp
         _pendingResponseTracker = pendingResponseTracker;
     }
 
-    public override async Task<IExecutionResult> HandleAsync(MessagingContext<T> messagingContext)
+    public async Task<IExecutionResult> HandleAsync(MessagingContext<T> messagingContext)
     {
         var taskCompletionSource = _pendingResponseTracker.GetCompletion(messagingContext.CorrelationId);
 

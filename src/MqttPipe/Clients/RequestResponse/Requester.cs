@@ -2,7 +2,6 @@ using MessagingLibrary.Core.Clients;
 using MessagingLibrary.Core.Definitions.Subscriptions;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Serialization;
-using MqttPipe.Clients.RequestResponse.Handlers;
 using MqttPipe.Configuration.Configuration;
 
 namespace MqttPipe.Clients.RequestResponse;

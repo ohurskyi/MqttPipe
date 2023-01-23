@@ -9,7 +9,7 @@ using MqttPipe.Tests.Contracts;
 
 namespace MqttPipe.Tests.Handlers;
 
-public class HandlerForAllDeviceNumbers : MessageHandler<DeviceMessageContract>
+public class HandlerForAllDeviceNumbers : IMessageHandlerGeneric<DeviceMessageContract>
 {
     private readonly TextWriter _textWriter;
 

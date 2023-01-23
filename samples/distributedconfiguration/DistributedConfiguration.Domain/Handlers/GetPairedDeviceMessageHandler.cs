@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DistributedConfiguration.Domain.Handlers;
 
-public class GetPairedDeviceMessageHandler : MessageHandler<GetPairedDeviceContract>
+public class GetPairedDeviceMessageHandler : IMessageHandlerGeneric<GetPairedDeviceContract>
 {
     private readonly ILogger<PairDeviceMessageHandler> _logger;
 
@@ -16,7 +16,7 @@ public class GetPairedDeviceMessageHandler : MessageHandler<GetPairedDeviceContr
         _logger = logger;
     }
 
-    protected override async Task<IExecutionResult> HandleAsync(MessagingContext<GetPairedDeviceContract> messagingContext)
+    public async Task<IExecutionResult> HandleAsync(MessagingContext<GetPairedDeviceContract> messagingContext)
     {
         var payload = messagingContext.Message;
         

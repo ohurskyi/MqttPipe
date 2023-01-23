@@ -11,7 +11,7 @@ using Shooting.Domain.Events.ShootingStartedEvent;
 
 namespace Shooting.Domain.Handlers.ShootingInfo;
 
-public class RecordShootingSessionStartedMessageHandler :  MessageHandler<ShootingInfoContract> 
+public class RecordShootingSessionStartedMessageHandler :  IMessageHandlerGeneric<ShootingInfoContract> 
 {
     private readonly ILogger<RecordShootingSessionStartedMessageHandler> _logger;
     private readonly IMediator _mediator;
@@ -22,7 +22,7 @@ public class RecordShootingSessionStartedMessageHandler :  MessageHandler<Shooti
         _logger = logger;
     }
 
-    public override async Task<IExecutionResult> HandleAsync(MessagingContext<ShootingInfoContract> messagingContext)
+    public async Task<IExecutionResult> HandleAsync(MessagingContext<ShootingInfoContract> messagingContext)
     {
         var payload = messagingContext.Message;
         _logger.LogInformation("Shooting started on Lane {laneNumber}",  payload.LaneNumber);

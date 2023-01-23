@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MqttPipe.Clients;
 using MqttPipe.Clients.RequestResponse;
-using MqttPipe.Clients.RequestResponse.Handlers;
 using MqttPipe.Configuration.Configuration;
 
 namespace MqttPipe.Configuration.DependencyInjection;
