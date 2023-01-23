@@ -8,6 +8,27 @@ using Microsoft.Extensions.Logging;
 
 namespace MqttPipe.Middlewares;
 
+public class LoggingMiddlewareGeneric<T> : IMessageMiddlewareGeneric<T> where T : class, IMessageContract
+{
+    private readonly ILogger<LoggingMiddlewareGeneric<T>> _logger;
+
+    public LoggingMiddlewareGeneric(ILogger<LoggingMiddlewareGeneric<T>> logger)
+    {
+        _logger = logger;
+    }
+
+    public async Task<HandlerResult> Handle<TMessagingClientOptions>(MessagingContext<T> context, MessageHandlerDelegate next) 
+        where TMessagingClientOptions : class, IMessagingClientOptions
+    {
+        var msgType = typeof(T).Name;
+        var topic = context.Topic;
+        _logger.LogDebug("Begin message: {msg} handling on topic: {topic}", msgType, topic);
+        var result = await next();
+        _logger.LogDebug("End message: {msg} handling on topic: {topic}", msgType, topic);
+        return result;
+    }
+}
+
 public class LoggingMiddleware<TMessagingClientOptions> : IMessageMiddleware<TMessagingClientOptions>  
     where TMessagingClientOptions : IMessagingClientOptions
 {

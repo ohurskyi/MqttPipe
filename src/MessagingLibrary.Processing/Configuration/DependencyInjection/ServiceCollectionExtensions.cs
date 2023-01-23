@@ -11,7 +11,7 @@ namespace MessagingLibrary.Processing.Configuration.DependencyInjection;
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddMessagingPipeline<TMessagingClientOptions>(this IServiceCollection serviceCollection)
-        where TMessagingClientOptions: IMessagingClientOptions
+        where TMessagingClientOptions: class, IMessagingClientOptions
     {
         serviceCollection.AddRequiredServices<TMessagingClientOptions>();
 
@@ -19,7 +19,7 @@ public static class ServiceCollectionExtensions
     }
 
     private static IServiceCollection AddRequiredServices<TMessagingClientOptions>(this IServiceCollection serviceCollection) 
-        where TMessagingClientOptions: IMessagingClientOptions
+        where TMessagingClientOptions: class, IMessagingClientOptions
     {
         serviceCollection.AddMessageHandlerFactory<TMessagingClientOptions>();
 

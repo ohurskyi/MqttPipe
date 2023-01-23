@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace MessagingLibrary.Processing.Executor
 {
     public class ScopedMessageExecutor<TMessagingClientOptions> : IMessageExecutor<TMessagingClientOptions> 
-        where TMessagingClientOptions: IMessagingClientOptions
+        where TMessagingClientOptions: class, IMessagingClientOptions
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
