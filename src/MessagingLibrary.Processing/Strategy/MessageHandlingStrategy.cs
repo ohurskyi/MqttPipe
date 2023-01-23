@@ -1,49 +1,65 @@
-﻿using MessagingLibrary.Core.Configuration;
+using MessagingLibrary.Core.Configuration;
 using MessagingLibrary.Core.Contexts;
 using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Handlers;
+using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
 using MessagingLibrary.Processing.Middlewares;
 
 namespace MessagingLibrary.Processing.Strategy;
 
-public class MessageHandlingStrategy<TMessagingClientOptions> : IMessageHandlingStrategy<TMessagingClientOptions>
-    where TMessagingClientOptions: IMessagingClientOptions
+public abstract class MessageHandlingStrategyBase
 {
-    private readonly IMessageHandlerFactory<TMessagingClientOptions> _messageHandlerFactory;
+    public abstract Task<HandlerResult> Handle<TMessagingClientOptions>(object ctx) 
+        where TMessagingClientOptions : class, IMessagingClientOptions;
+}
+
+public class MessageHandlingStrategy<T> : MessageHandlingStrategyBase
+    where T : class, IMessageContract
+{
     private readonly ServiceFactory _serviceFactory;
 
-    public MessageHandlingStrategy(
-        IMessageHandlerFactory<TMessagingClientOptions> messageHandlerFactory, 
-        ServiceFactory serviceFactory)
+    public MessageHandlingStrategy(ServiceFactory serviceFactory)
     {
-        _messageHandlerFactory = messageHandlerFactory;
         _serviceFactory = serviceFactory;
     }
-
-    public async Task<HandlerResult> Handle(MessagingContext messagingContext)
+    
+    public override Task<HandlerResult> Handle<TMessagingClientOptions>(object ctx)
     {
-        return new HandlerResult();
+        return HandleAsync<TMessagingClientOptions>((MessagingContext<T>)ctx);
     }
 
-    private async Task<HandlerResult> HandleInner(IEnumerable<IMessageHandler> handlers, MessagingContext context)
+    private async Task<HandlerResult> HandleAsync<TMessagingClientOptions>(MessagingContext<T> messagingContext) 
+        where TMessagingClientOptions : class, IMessagingClientOptions
     {
-        var executionResults = await HandleCore(handlers, context);
+        var factory = _serviceFactory.GetInstance<IMessageHandlerFactory<TMessagingClientOptions>>();
+        
+        var handlers = factory.GetHandlers<T>(messagingContext.Topic, _serviceFactory);
+        
+        Task<HandlerResult> HandlerFunc() => HandleCore(messagingContext, handlers);
 
-        var handlerResult = new HandlerResult();
+        var middlewares = _serviceFactory
+            .GetInstances<IMessageMiddleware<T>>()
+            .Reverse()
+            .Aggregate((MessageHandlerDelegate)HandlerFunc, 
+                (next, pipeline) => () => pipeline.Handle<TMessagingClientOptions>(messagingContext, next));
 
-        foreach (var executionResult in executionResults)
-        {
-            handlerResult.AddResult(executionResult);
-        }
+        var handlerResult = await middlewares();
 
         return handlerResult;
     }
 
-    protected virtual async Task<IEnumerable<IExecutionResult>> HandleCore(IEnumerable<IMessageHandler> handlers, MessagingContext context)
+    private async Task<HandlerResult> HandleCore(MessagingContext<T> messagingContext, IEnumerable<IMessageHandlerGeneric<T>> handlers)
     {
         var executionResults = new List<IExecutionResult>();
-        
-        return executionResults;
+        foreach (var handler in handlers)
+        {
+            var result = await handler.HandleAsync(messagingContext);
+            executionResults.Add(result);
+        }
+
+        var handlerResult = new HandlerResult();
+        handlerResult.AddResults(executionResults);
+        return handlerResult;
     }
 }

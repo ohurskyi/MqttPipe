@@ -25,7 +25,7 @@ public static class ServiceCollectionExtensions
         
         serviceCollection.TryAddSingleton<IMessageExecutor<TMessagingClientOptions>, ScopedMessageExecutor<TMessagingClientOptions>>();
         
-        serviceCollection.TryAddTransient(typeof(MessageHandlingStrategyGeneric<>));
+        serviceCollection.TryAddTransient(typeof(MessageHandlingStrategy<>));
 
         return serviceCollection;
     }

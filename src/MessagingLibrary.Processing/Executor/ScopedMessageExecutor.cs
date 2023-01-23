@@ -18,17 +18,12 @@ namespace MessagingLibrary.Processing.Executor
 
         public async Task ExecuteAsync(IMessage message)
         {
-            await ExecuteAsyncNew(message);
-        }
-
-        private async Task ExecuteAsyncNew(IMessage message)
-        {
             using var scope = _serviceScopeFactory.CreateScope();
             var messagingContextFactory = scope.ServiceProvider.GetRequiredService<IMessagingContextFactory>();
             if (messagingContextFactory.TryGetContext(message, out var context))
             {
-                var constructedType = typeof(MessageHandlingStrategyGeneric<>).MakeGenericType(context.Message.GetType());
-                var handlingStrategyGenericBase = (MessageHandlingStrategyGenericBase)scope.ServiceProvider.GetRequiredService(constructedType);
+                var constructedType = typeof(MessageHandlingStrategy<>).MakeGenericType(context.Message.GetType());
+                var handlingStrategyGenericBase = (MessageHandlingStrategyBase)scope.ServiceProvider.GetRequiredService(constructedType);
                 await handlingStrategyGenericBase.Handle<TMessagingClientOptions>(context);
             }
         }
