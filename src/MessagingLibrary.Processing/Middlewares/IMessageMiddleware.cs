@@ -8,12 +8,7 @@ namespace MessagingLibrary.Processing.Middlewares;
 
 public delegate Task<HandlerResult> MessageHandlerDelegate();
 
-public interface IMessageMiddleware<TMessagingClientOptions> where TMessagingClientOptions : IMessagingClientOptions
-{
-    Task<HandlerResult> Handle(MessagingContext context, MessageHandlerDelegate next);
-}
-
-public interface IMessageMiddlewareGeneric<T> where T : class, IMessageContract
+public interface IMessageMiddleware<T> where T : class, IMessageContract
 {
     Task<HandlerResult> Handle<TMessagingClientOptions>(MessagingContext<T> context, MessageHandlerDelegate next)
         where TMessagingClientOptions : class, IMessagingClientOptions;

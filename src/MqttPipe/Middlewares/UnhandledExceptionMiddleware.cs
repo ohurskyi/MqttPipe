@@ -7,11 +7,11 @@ using Microsoft.Extensions.Logging;
 
 namespace MqttPipe.Middlewares;
 
-public class UnhandledExceptionMiddlewareGeneric<T> : IMessageMiddlewareGeneric<T> where T : class, IMessageContract
+public class UnhandledExceptionMiddleware<T> : IMessageMiddleware<T> where T : class, IMessageContract
 {
-    private readonly ILogger<UnhandledExceptionMiddlewareGeneric<T>> _logger;
+    private readonly ILogger<UnhandledExceptionMiddleware<T>> _logger;
 
-    public UnhandledExceptionMiddlewareGeneric(ILogger<UnhandledExceptionMiddlewareGeneric<T>> logger)
+    public UnhandledExceptionMiddleware(ILogger<UnhandledExceptionMiddleware<T>> logger)
     {
         _logger = logger;
     }
@@ -27,31 +27,6 @@ public class UnhandledExceptionMiddlewareGeneric<T> : IMessageMiddlewareGeneric<
         {
             _logger.LogError(e, "Unhandled Exception while processing message: {msg} on topic {topicValue}",
                 typeof(T).Name, context.Topic);
-            throw;
-        }
-    }
-}
-
-
-public class UnhandledExceptionMiddleware<TMessagingClientOptions> : IMessageMiddleware<TMessagingClientOptions>  
-    where TMessagingClientOptions : IMessagingClientOptions
-{
-    private readonly ILogger<UnhandledExceptionMiddleware<TMessagingClientOptions>> _logger;
-
-    public UnhandledExceptionMiddleware(ILogger<UnhandledExceptionMiddleware<TMessagingClientOptions>> logger)
-    {
-        _logger = logger;
-    }
-
-    public async Task<HandlerResult> Handle(MessagingContext context, MessageHandlerDelegate next)
-    {
-        try
-        {
-            return await next();
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Unhandled Exception while processing message on topic {topicValue}", context.Topic);
             throw;
         }
     }

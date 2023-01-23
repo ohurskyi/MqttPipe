@@ -39,7 +39,7 @@ public class MessageHandlingStrategyGeneric<T> : MessageHandlingStrategyGenericB
         Task<HandlerResult> HandlerFunc() => HandleCore(messagingContext, handlers);
 
         var middlewares = _serviceFactory
-            .GetInstances<IMessageMiddlewareGeneric<T>>()
+            .GetInstances<IMessageMiddleware<T>>()
             .Reverse()
             .Aggregate((MessageHandlerDelegate)HandlerFunc, 
                 (next, pipeline) => () => pipeline.Handle<TMessagingClientOptions>(messagingContext, next));

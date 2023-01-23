@@ -18,7 +18,6 @@ public static class MessagingPipelineServiceCollectionExtensions
         return serviceCollection
             .AddMessagingPipeline<TMessagingClientOptions>()
             .AddMqttTopicComparer()
-            .AddInternalMiddlewares<TMessagingClientOptions>()
             .AddMqttApplicationMessageReceivedHandler<TMessagingClientOptions>();
     }
 
@@ -26,23 +25,13 @@ public static class MessagingPipelineServiceCollectionExtensions
     {
         serviceCollection.TryAddEnumerable(new[]
         {
-            ServiceDescriptor.Transient(typeof(IMessageMiddlewareGeneric<>),
-                typeof(UnhandledExceptionMiddlewareGeneric<>)),
-            ServiceDescriptor.Transient(typeof(IMessageMiddlewareGeneric<>), typeof(LoggingMiddlewareGeneric<>)),
-            ServiceDescriptor.Transient(typeof(IMessageMiddlewareGeneric<>), typeof(PublishMiddlewareGeneric<>)),
-            ServiceDescriptor.Transient(typeof(IMessageMiddlewareGeneric<>), typeof(ReplyMiddlewareGeneric<>)),
+            ServiceDescriptor.Transient(typeof(IMessageMiddleware<>),
+                typeof(UnhandledExceptionMiddleware<>)),
+            ServiceDescriptor.Transient(typeof(IMessageMiddleware<>), typeof(LoggingMiddleware<>)),
+            ServiceDescriptor.Transient(typeof(IMessageMiddleware<>), typeof(PublishMiddleware<>)),
+            ServiceDescriptor.Transient(typeof(IMessageMiddleware<>), typeof(ReplyMiddleware<>)),
         });
         
-        return serviceCollection;
-    }
-
-    private static IServiceCollection AddInternalMiddlewares<TMessagingClientOptions>(this IServiceCollection serviceCollection)
-        where TMessagingClientOptions : class, IMqttMessagingClientOptions
-    {
-        serviceCollection.AddMiddleware<UnhandledExceptionMiddleware<TMessagingClientOptions>, TMessagingClientOptions>();
-        serviceCollection.AddMiddleware<LoggingMiddleware<TMessagingClientOptions>, TMessagingClientOptions>();
-        serviceCollection.AddMiddleware<PublishMiddleware<TMessagingClientOptions>, TMessagingClientOptions>();
-        serviceCollection.AddMiddleware<ReplyMiddleware<TMessagingClientOptions>, TMessagingClientOptions>();
         return serviceCollection;
     }
 }
