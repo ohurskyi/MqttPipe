@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using MessagingLibrary.Core.Handlers;
+using MessagingLibrary.Core.Messages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -7,6 +8,14 @@ namespace MessagingLibrary.Core.Configuration.DependencyInjection;
 
 public static class HandlerServiceCollectionExtensions
 {
+    public static IServiceCollection AddMessageHandlerNew<TContract, THandler>(this IServiceCollection serviceCollection)
+        where TContract: class, IMessageContract
+        where THandler : class, IMessageHandlerGeneric<TContract>
+    {
+        serviceCollection.TryAddTransient<THandler>();
+        return serviceCollection;
+    }
+    
     public static IServiceCollection AddMessageHandler<T>(this IServiceCollection serviceCollection) where T : class, IMessageHandler
     { 
         serviceCollection.TryAddTransient<T>();

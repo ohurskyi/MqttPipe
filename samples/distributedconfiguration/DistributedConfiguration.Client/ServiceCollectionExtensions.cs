@@ -1,5 +1,6 @@
 ﻿using DistributedConfiguration.Client.Consumers;
 using DistributedConfiguration.Client.IntegrationEvents.PairedDevicesConfigurationChanged;
+using DistributedConfiguration.Contracts.Pairing;
 using MessagingLibrary.Core.Configuration.DependencyInjection;
 using MessagingLibrary.Processing.Configuration.DependencyInjection;
 
@@ -9,8 +10,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddDomainServices(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddMessageHandler<UpdateLocalConfigurationMessageHandler>();
-        serviceCollection.AddMessageHandler<NotifyUsersMessageHandler>();
+        serviceCollection.AddMessageHandlerNew<DevicesConfigurationChangedContract, UpdateLocalConfigurationMessageHandler>();
+        serviceCollection.AddMessageHandlerNew<DevicesConfigurationChangedContract, NotifyUsersMessageHandler>();
         serviceCollection.AddConsumerDefinitionListenerProvider<ConsumerDefinitionListenerProvider>();
         serviceCollection.AddMessageConsumersHostedService();
         return serviceCollection;

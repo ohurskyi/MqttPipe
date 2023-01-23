@@ -1,4 +1,5 @@
 ﻿using DistributedConfiguration.Client.IntegrationEvents.PairedDevicesConfigurationChanged;
+using DistributedConfiguration.Contracts.Pairing;
 using DistributedConfiguration.Contracts.Topics;
 using MessagingLibrary.Core.Definitions.Consumers;
 using MessagingLibrary.Core.Definitions.Subscriptions;
@@ -11,8 +12,8 @@ public class PairedDevicesConsumerDefinition : IConsumerDefinition
     {
         return new List<ISubscriptionDefinition>
         {
-            new SubscriptionDefinition<UpdateLocalConfigurationMessageHandler>($"{DistributedConfigurationTopicConstants.CurrentConfiguration}"),
-            new SubscriptionDefinition<NotifyUsersMessageHandler>($"{DistributedConfigurationTopicConstants.CurrentConfiguration}")
+            new SubscriptionDefinition<DevicesConfigurationChangedContract, UpdateLocalConfigurationMessageHandler>($"{DistributedConfigurationTopicConstants.CurrentConfiguration}"),
+            new SubscriptionDefinition<DevicesConfigurationChangedContract, NotifyUsersMessageHandler>($"{DistributedConfigurationTopicConstants.CurrentConfiguration}")
         };
     }
 }

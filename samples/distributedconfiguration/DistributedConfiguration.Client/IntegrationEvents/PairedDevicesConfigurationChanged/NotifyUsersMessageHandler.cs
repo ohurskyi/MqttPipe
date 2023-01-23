@@ -1,8 +1,6 @@
 ﻿using DistributedConfiguration.Contracts.Pairing;
 using MessagingLibrary.Core.Contexts;
-using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Handlers;
-using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
 
 namespace DistributedConfiguration.Client.IntegrationEvents.PairedDevicesConfigurationChanged;
