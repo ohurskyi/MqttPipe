@@ -1,5 +1,6 @@
 ﻿using MessagingLibrary.Core.Configuration;
 using MessagingLibrary.Core.Configuration.DependencyInjection;
+using MessagingLibrary.Core.Handlers;
 using MessagingLibrary.Processing.Executor;
 using MessagingLibrary.Processing.Strategy;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +26,12 @@ public static class ServiceCollectionExtensions
         serviceCollection.TryAddTransient<IMessageHandlingStrategy<TMessagingClientOptions>, MessageHandlingStrategy<TMessagingClientOptions>>();
         
         serviceCollection.TryAddSingleton<IMessageExecutor<TMessagingClientOptions>, ScopedMessageExecutor<TMessagingClientOptions>>();
+        
+        serviceCollection.TryAddTransient(typeof(MessageHandlingStrategyGeneric<>));
+        
+        // test
+        serviceCollection.AddTransient<TestMessageHandlerGeneric>();
+        serviceCollection.AddTransient<TestMessageHandlerGeneric1>();
 
         return serviceCollection;
     }

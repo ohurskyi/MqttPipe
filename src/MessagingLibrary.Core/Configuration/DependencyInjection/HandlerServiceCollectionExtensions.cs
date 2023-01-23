@@ -29,4 +29,29 @@ public static class HandlerServiceCollectionExtensions
 
         return serviceCollection;
     }
+    
+    public static IServiceCollection AddMessageHandlersNew(this IServiceCollection serviceCollection, params Assembly[] assemblies)
+    {
+        assemblies = assemblies.Distinct().ToArray();
+        
+        var implementationTypes = assemblies
+            .SelectMany(a => a.DefinedTypes)
+            .Where(Match)
+            .ToList();
+
+        foreach (var handlerType in implementationTypes)
+        {
+            serviceCollection.AddTransient(handlerType);
+        }
+
+        return serviceCollection;
+    }
+
+    private static bool Match(Type type)
+    {
+        var interfaces = type.GetInterfaces();
+        var match = interfaces.Any(i =>
+                        i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IMessageHandlerGeneric<>));
+        return match;
+    }
 }

@@ -16,7 +16,7 @@ public class TargetLayerCreatedMessageHandler : MessageHandler<TargetLayersCreat
         _logger = logger;
     }
 
-    protected override async Task<IExecutionResult> HandleAsync(MessagingContext<TargetLayersCreatedContract> messagingContext)
+    public override async Task<IExecutionResult> HandleAsync(MessagingContext<TargetLayersCreatedContract> messagingContext)
     {
         var layers = messagingContext.Message.Layers;
         _logger.LogInformation("Send Created {layer} to UI", layers);

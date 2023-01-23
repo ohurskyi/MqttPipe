@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using MessagingLibrary.Core.Configuration;
 using MessagingLibrary.Core.Handlers;
+using MessagingLibrary.Core.Messages;
 
 namespace MessagingLibrary.Core.Factory;
 
@@ -41,8 +42,20 @@ public class MessageHandlerFactory<TMessagingClientOptions> : IMessageHandlerFac
         var instances = _handlersMap
             .Where(k => _topicFilterComparer.IsMatch(topic, k.Key))
             .SelectMany(k => k.Value.Keys)
-            .Select(serviceFactory.GetInstance<IMessageHandler>);
+            .Select(x => serviceFactory.GetInstance<IMessageHandler>(x));
 
+        return instances;
+    }
+
+    public IEnumerable<IMessageHandlerGeneric<T>> GetHandlersNew<T>(string topic, ServiceFactory serviceFactory) where T : class, IMessageContract
+    {
+        var types = _handlersMap
+            .Where(k => _topicFilterComparer.IsMatch(topic, k.Key))
+            .SelectMany(k => k.Value.Keys)
+            .ToList();
+        var instances = types
+            .Select(x => serviceFactory.GetInstance<IMessageHandlerGeneric<T>>(x))
+            .ToList();
         return instances;
     }
 

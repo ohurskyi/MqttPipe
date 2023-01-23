@@ -15,7 +15,10 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddShootingDomainServices(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddMessageHandlers(typeof(CreateTargetLayerMessageHandler).Assembly);
+        // add explicit
+        // todo how to scan open generics
+       // serviceCollection.AddTransient<CreateTargetLayerMessageHandler>();
+       serviceCollection.AddMessageHandlersNew(typeof(CreateTargetLayerMessageHandler).Assembly);
         serviceCollection.AddConsumerDefinitionListenerProvider<ConsumerDefinitionListenerProvider>();
         serviceCollection.AddMessageConsumersHostedService();
 

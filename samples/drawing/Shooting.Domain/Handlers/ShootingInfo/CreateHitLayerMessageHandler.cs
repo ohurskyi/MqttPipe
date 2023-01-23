@@ -23,7 +23,7 @@ public class CreateHitLayerMessageHandler : MessageHandler<ShootingInfoContract>
         _mediator = mediator;
     }
 
-    protected override async Task<IExecutionResult> HandleAsync(MessagingContext<ShootingInfoContract> messagingContext)
+    public override async Task<IExecutionResult> HandleAsync(MessagingContext<ShootingInfoContract> messagingContext)
     {
         var payload = messagingContext.Message;
         await Task.Delay(TimeSpan.FromMilliseconds(Random.Shared.Next(200, 300)));

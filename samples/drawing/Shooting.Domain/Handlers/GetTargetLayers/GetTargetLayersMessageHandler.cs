@@ -19,7 +19,7 @@ public class GetTargetLayersMessageHandler : MessageHandler<GetTargetLayersReque
         _logger = logger;
     }
 
-    protected override async Task<IExecutionResult> HandleAsync(MessagingContext<GetTargetLayersRequest> messagingContext)
+    public override async Task<IExecutionResult> HandleAsync(MessagingContext<GetTargetLayersRequest> messagingContext)
     {
         var payload = messagingContext.Message;
         var laneNumber = payload.LaneNumber;

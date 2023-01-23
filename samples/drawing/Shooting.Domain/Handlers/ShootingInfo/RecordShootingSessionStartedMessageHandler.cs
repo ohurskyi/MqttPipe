@@ -22,7 +22,7 @@ public class RecordShootingSessionStartedMessageHandler :  MessageHandler<Shooti
         _logger = logger;
     }
 
-    protected override async Task<IExecutionResult> HandleAsync(MessagingContext<ShootingInfoContract> messagingContext)
+    public override async Task<IExecutionResult> HandleAsync(MessagingContext<ShootingInfoContract> messagingContext)
     {
         var payload = messagingContext.Message;
         _logger.LogInformation("Shooting started on Lane {laneNumber}",  payload.LaneNumber);

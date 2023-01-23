@@ -1,5 +1,6 @@
 ﻿using MessagingLibrary.Core.Configuration;
 using MessagingLibrary.Core.Handlers;
+using MessagingLibrary.Core.Messages;
 
 namespace MessagingLibrary.Core.Factory;
 
@@ -10,4 +11,7 @@ public interface IMessageHandlerFactory<TMessagingClientOptions> where TMessagin
     int RemoveHandler<THandler>(string topic) where THandler : class, IMessageHandler;
     int RemoveHandler(Type handlerType, string topic);
     IEnumerable<IMessageHandler> GetHandlers(string topic, ServiceFactory serviceFactory);
+
+    IEnumerable<IMessageHandlerGeneric<T>> GetHandlersNew<T>(string topic, ServiceFactory serviceFactory)
+        where T : class, IMessageContract;
 }

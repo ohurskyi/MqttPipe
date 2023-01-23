@@ -14,7 +14,7 @@ public class ResponseHandler<T> : MessageHandler<T> where T: class, IMessageResp
         _pendingResponseTracker = pendingResponseTracker;
     }
 
-    protected override async Task<IExecutionResult> HandleAsync(MessagingContext<T> messagingContext)
+    public override async Task<IExecutionResult> HandleAsync(MessagingContext<T> messagingContext)
     {
         var taskCompletionSource = _pendingResponseTracker.GetCompletion(messagingContext.CorrelationId);
 

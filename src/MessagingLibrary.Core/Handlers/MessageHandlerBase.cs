@@ -4,12 +4,7 @@ using MessagingLibrary.Core.Results;
 
 namespace MessagingLibrary.Core.Handlers;
 
-public abstract class MessageHandler<T> : IMessageHandler where T: class, IMessageContract
+public abstract class MessageHandler<T> : IMessageHandlerGeneric<T> where T: class, IMessageContract
 {
-    public Task<IExecutionResult> Handle(object ctx)
-    {
-        return HandleAsync((MessagingContext<T>)ctx);
-    }
-
-    protected abstract Task<IExecutionResult> HandleAsync(MessagingContext<T> messagingContext);
+    public abstract Task<IExecutionResult> HandleAsync(MessagingContext<T> messagingContext);
 }
