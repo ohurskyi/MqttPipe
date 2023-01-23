@@ -9,7 +9,7 @@ namespace MessagingLibrary.Processing.Executor;
 
 public abstract class MessageHandlingStrategyGenericBase
 {
-    public abstract Task Handle<TMessagingClientOptions>(object ctx) where TMessagingClientOptions : IMessagingClientOptions;
+    public abstract Task<HandlerResult> Handle<TMessagingClientOptions>(object ctx) where TMessagingClientOptions : IMessagingClientOptions;
 }
 
 public class MessageHandlingStrategyGeneric<T> : MessageHandlingStrategyGenericBase
@@ -22,57 +22,31 @@ public class MessageHandlingStrategyGeneric<T> : MessageHandlingStrategyGenericB
         _serviceFactory = serviceFactory;
     }
     
-    public override Task Handle<TMessagingClientOptions>(object ctx)
+    public override Task<HandlerResult> Handle<TMessagingClientOptions>(object ctx)
+    {
+        return HandleAsync<TMessagingClientOptions>((MessagingContext<T>)ctx);
+    }
+
+    private async Task<HandlerResult> HandleAsync<TMessagingClientOptions>(MessagingContext<T> messagingContext) where TMessagingClientOptions : IMessagingClientOptions
     {
         var factory = _serviceFactory.GetInstance<IMessageHandlerFactory<TMessagingClientOptions>>();
-        return HandleAsync((MessagingContext<T>)ctx, factory);
+        var handlers = factory.GetHandlersNew<T>(messagingContext.Topic, _serviceFactory);
+        var results = await HandleInner(messagingContext, handlers);
+        var handlerResult = new HandlerResult();
+        handlerResult.AddResults(results);
+        return handlerResult;
     }
 
-    private Task HandleAsync<TMessagingClientOptions>(MessagingContext<T> messagingContext, IMessageHandlerFactory<TMessagingClientOptions> factory) where TMessagingClientOptions : IMessagingClientOptions
+    private static async Task<List<IExecutionResult>> HandleInner(MessagingContext<T> messagingContext, IEnumerable<IMessageHandlerGeneric<T>> handlers)
     {
-        var handlers = factory.GetHandlersNew<T>(messagingContext.Topic, _serviceFactory);
+        var executionResults = new List<IExecutionResult>();
+
         foreach (var handler in handlers)
         {
-            handler.HandleAsync(messagingContext);
+            var result = await handler.HandleAsync(messagingContext);
+            executionResults.Add(result);
         }
-        return Task.CompletedTask;
-    }
 
-    private IEnumerable<IMessageHandlerGeneric<T>> GetHandlers(string topic, ServiceFactory serviceFactory)
-    {
-        var handlerTypes = new List<Type>
-        {
-            typeof(TestMessageHandlerGeneric), typeof(TestMessageHandlerGeneric1)
-        };
-        var instances = handlerTypes
-            .Select(h => serviceFactory.GetInstance<IMessageHandlerGeneric<T>>(h))
-            .ToList();
-        return instances;
-    }
-}
-
-public class ShootingInfoContractNew : IMessageContract
-{
-    public int LaneNumber { get; set; }
-}
-
-public class TestMessageHandlerGeneric : IMessageHandlerGeneric<ShootingInfoContractNew>
-{
-    public async Task<IExecutionResult> HandleAsync(MessagingContext<ShootingInfoContractNew> messagingContext)
-    {
-        var msg = messagingContext.Message;
-        var lane = msg.LaneNumber;
-        await Task.CompletedTask;
-        return new SuccessfulResult();
-    }
-}
-
-public class TestMessageHandlerGeneric1 : IMessageHandlerGeneric<ShootingInfoContractNew>
-{
-    public async Task<IExecutionResult> HandleAsync(MessagingContext<ShootingInfoContractNew> messagingContext)
-    {
-        var msg = messagingContext.Message;
-        await Task.CompletedTask;
-        return new SuccessfulResult();
+        return executionResults;
     }
 }

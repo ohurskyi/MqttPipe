@@ -8,4 +8,8 @@ public class HandlerResult
     {
         ExecutionResults.Add(executionResult);
     }
+    public void AddResults(IEnumerable<IExecutionResult> results)
+    {
+        ExecutionResults.AddRange(results);
+    }
 }
