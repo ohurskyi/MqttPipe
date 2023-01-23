@@ -1,6 +1,5 @@
 ﻿using MessagingLibrary.Core.Configuration;
 using MessagingLibrary.Core.Contexts;
-using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
 
