@@ -38,7 +38,7 @@ public class MqttReceivedMessageHandlerTests
         
         const string multiWildCardDeviceTopic = $"{DeviceTopicConstants.DeviceTopic}/#";
         var topicClient = serviceProvider.GetRequiredService<ITopicClient<TestMessagingClientOptions>>();
-        await topicClient.Subscribe(new SubscriptionDefinition<HandlerForAllDeviceNumbers>(multiWildCardDeviceTopic));
+        await topicClient.Subscribe(new SubscriptionDefinition<DeviceMessageContract, HandlerForAllDeviceNumbers>(multiWildCardDeviceTopic));
         
         var contract =  new DeviceMessageContract { Name = "Device" };
         var publishTopic = $"{DeviceTopicConstants.DeviceTopic}/{deviceNumber}";
@@ -66,10 +66,10 @@ public class MqttReceivedMessageHandlerTests
         const int deviceNumberTwo = 2;
 
         var topicClient = serviceProvider.GetRequiredService<ITopicClient<TestMessagingClientOptions>>();
-        await topicClient.Subscribe(new SubscriptionDefinition<HandlerForDeviceNumber1>($"{DeviceTopicConstants.DeviceTopic}/{deviceNumberOne}"));
-        await topicClient.Subscribe(new SubscriptionDefinition<HandlerForDeviceNumber2>($"{DeviceTopicConstants.DeviceTopic}/{deviceNumberTwo}"));
+        await topicClient.Subscribe(new SubscriptionDefinition<DeviceMessageContract, HandlerForDeviceNumber1>($"{DeviceTopicConstants.DeviceTopic}/{deviceNumberOne}"));
+        await topicClient.Subscribe(new SubscriptionDefinition<DeviceMessageContract, HandlerForDeviceNumber2>($"{DeviceTopicConstants.DeviceTopic}/{deviceNumberTwo}"));
 
-        var contract =  new DeviceMessageContract { Name = "Device" };
+        var contract = new DeviceMessageContract { Name = "Device" };
         var publishTopic = $"{DeviceTopicConstants.DeviceTopic}/{deviceNumberOne}";
 
         // act
@@ -96,11 +96,11 @@ public class MqttReceivedMessageHandlerTests
         const int deviceNumberTwo = 2;
 
         var topicClient = serviceProvider.GetRequiredService<ITopicClient<TestMessagingClientOptions>>();
-        await topicClient.Subscribe(new SubscriptionDefinition<HandlerForDeviceNumber1>($"{DeviceTopicConstants.DeviceTopic}/+/temperature/{deviceNumberOne}"));
-        await topicClient.Subscribe(new SubscriptionDefinition<HandlerForDeviceNumber2>($"{DeviceTopicConstants.DeviceTopic}/+/temperature/{deviceNumberTwo}"));
-        await topicClient.Subscribe(new SubscriptionDefinition<HandlerForAllDeviceNumbers>($"{DeviceTopicConstants.DeviceTopic}/+/temperature"));
+        await topicClient.Subscribe(new SubscriptionDefinition<DeviceMessageContract, HandlerForDeviceNumber1>($"{DeviceTopicConstants.DeviceTopic}/+/temperature/{deviceNumberOne}"));
+        await topicClient.Subscribe(new SubscriptionDefinition<DeviceMessageContract, HandlerForDeviceNumber2>($"{DeviceTopicConstants.DeviceTopic}/+/temperature/{deviceNumberTwo}"));
+        await topicClient.Subscribe(new SubscriptionDefinition<DeviceMessageContract, HandlerForAllDeviceNumbers>($"{DeviceTopicConstants.DeviceTopic}/+/temperature"));
 
-        var contract =  new DeviceMessageContract { Name = "Device" };
+        var contract = new DeviceMessageContract { Name = "Device" };
         var publishTopic = $"{DeviceTopicConstants.DeviceTopic}/{deviceNumberOne}/temperature";
 
         // act
@@ -132,7 +132,7 @@ public class MqttReceivedMessageHandlerTests
         serviceCollection.AddSingleton<ITopicClient<TestMessagingClientOptions>, InMemoryTopicClient<TestMessagingClientOptions>>();
         serviceCollection.AddMessagingPipeline<TestMessagingClientOptions>();
         serviceCollection.AddMqttTopicComparer();
-        serviceCollection.AddMessageHandlers(typeof(HandlerForDeviceNumber1).Assembly);
+        serviceCollection.AddMessageHandlersNew(typeof(HandlerForDeviceNumber1).Assembly);
         
         return serviceCollection.BuildServiceProvider();
     }

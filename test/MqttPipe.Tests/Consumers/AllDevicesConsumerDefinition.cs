@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using MessagingLibrary.Core.Definitions.Consumers;
 using MessagingLibrary.Core.Definitions.Subscriptions;
+using MqttPipe.Tests.Contracts;
 using MqttPipe.Tests.Handlers;
 using MqttPipe.Tests.Topics;
 
@@ -12,6 +13,6 @@ public class AllDevicesConsumerDefinition : IConsumerDefinition
     
     public IEnumerable<ISubscriptionDefinition> Definitions() => new List<ISubscriptionDefinition>
     {
-        new SubscriptionDefinition<HandlerForAllDeviceNumbers>(MultiWildCardDeviceTopic)
+        new SubscriptionDefinition<DeviceMessageContract, HandlerForAllDeviceNumbers>(MultiWildCardDeviceTopic)
     };
 }
