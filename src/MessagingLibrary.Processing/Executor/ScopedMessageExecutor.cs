@@ -22,7 +22,8 @@ namespace MessagingLibrary.Processing.Executor
             var messagingContextFactory = scope.ServiceProvider.GetRequiredService<IMessagingContextFactory>();
             if (messagingContextFactory.TryGetContext(message, out var context))
             {
-                var constructedType = typeof(MessageHandlingStrategy<>).MakeGenericType(context.Message.GetType());
+                var messageType = context.Message.GetType();
+                var constructedType = typeof(MessageHandlingStrategy<>).MakeGenericType(messageType);
                 var handlingStrategyGenericBase = (MessageHandlingStrategyBase)scope.ServiceProvider.GetRequiredService(constructedType);
                 await handlingStrategyGenericBase.Handle<TMessagingClientOptions>(context);
             }
