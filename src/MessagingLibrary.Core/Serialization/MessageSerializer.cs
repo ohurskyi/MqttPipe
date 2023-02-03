@@ -5,16 +5,6 @@ using Newtonsoft.Json.Serialization;
 
 namespace MessagingLibrary.Core.Serialization;
 
-public class MessageWrapper
-{
-    public MessageWrapper(IMessageContract contract)
-    {
-        Contract = contract;
-    }
-
-    public IMessageContract Contract { get; }
-}
-
 public class MessageSerializer : IMessageSerializer
 {
     private readonly JsonSerializerSettings _serializerSettings;
@@ -28,8 +18,7 @@ public class MessageSerializer : IMessageSerializer
             SerializationBinder = new KnownMessageTypesAssemblyBinder(contractsProvider)
         };
     }
-
-    // add wrapper class
+    
     public string Serialize(IMessageContract messageContract)
     {
         var result =  JsonConvert.SerializeObject(messageContract, typeof(IMessageContract), _serializerSettings);
@@ -47,10 +36,5 @@ public class MessageSerializer : IMessageSerializer
         {
             throw new SerializationException($"Message can not be deserialized. Payload: {payload}", ex);
         }
-    }
-    
-    public T Deserialize<T>(string payload) where T: IMessageContract
-    {
-        return JsonConvert.DeserializeObject<T>(payload, _serializerSettings);
     }
 }
