@@ -16,13 +16,13 @@ public class LoggingMiddleware<T> : IMessageMiddleware<T> where T : class, IMess
         _logger = logger;
     }
 
-    public async Task<HandlerResult> Handle<TMessagingClientOptions>(MessagingContext<T> context, MessageHandlerDelegate next) 
+    public async Task<HandlerResult> Handle<TMessagingClientOptions>(MessagingContext<T> context, MessageHandlerDelegate<T> next) 
         where TMessagingClientOptions : class, IMessagingClientOptions
     {
         var msgType = typeof(T).Name;
         var topic = context.Topic;
         _logger.LogDebug("Begin {msg} handling from topic: {topic}", msgType, topic);
-        var result = await next();
+        var result = await next(context);
         _logger.LogDebug("End {msg} handling from topic: {topic}", msgType, topic);
         return result;
     }

@@ -4,18 +4,10 @@ using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Handlers;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
-using MessagingLibrary.Processing.Middlewares;
 
 namespace MessagingLibrary.Processing.Strategy;
 
-public abstract class MessageHandlingStrategyBase
-{
-    public abstract Task<HandlerResult> Handle<TMessagingClientOptions>(object ctx) 
-        where TMessagingClientOptions : class, IMessagingClientOptions;
-}
-
-public class MessageHandlingStrategy<T> : MessageHandlingStrategyBase
-    where T : class, IMessageContract
+public class MessageHandlingStrategy<T> where T : class, IMessageContract
 {
     private readonly ServiceFactory _serviceFactory;
 
@@ -23,28 +15,15 @@ public class MessageHandlingStrategy<T> : MessageHandlingStrategyBase
     {
         _serviceFactory = serviceFactory;
     }
-    
-    public override Task<HandlerResult> Handle<TMessagingClientOptions>(object ctx)
-    {
-        return HandleAsync<TMessagingClientOptions>((MessagingContext<T>)ctx);
-    }
 
-    private async Task<HandlerResult> HandleAsync<TMessagingClientOptions>(MessagingContext<T> messagingContext) 
+    public async Task<HandlerResult> HandleAsync<TMessagingClientOptions>(MessagingContext<T> messagingContext) 
         where TMessagingClientOptions : class, IMessagingClientOptions
     {
         var factory = _serviceFactory.GetInstance<IMessageHandlerFactory<TMessagingClientOptions>>();
         
         var handlers = factory.GetHandlers<T>(messagingContext.Topic, _serviceFactory);
-        
-        Task<HandlerResult> HandlerFunc() => HandleCore(messagingContext, handlers);
 
-        var middlewares = _serviceFactory
-            .GetInstances<IMessageMiddleware<T>>()
-            .Reverse()
-            .Aggregate((MessageHandlerDelegate)HandlerFunc, 
-                (next, pipeline) => () => pipeline.Handle<TMessagingClientOptions>(messagingContext, next));
-
-        var handlerResult = await middlewares();
+        var handlerResult = await HandleCore(messagingContext, handlers);
 
         return handlerResult;
     }

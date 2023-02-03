@@ -5,10 +5,11 @@ using MessagingLibrary.Core.Results;
 
 namespace MessagingLibrary.Processing.Middlewares;
 
-public delegate Task<HandlerResult> MessageHandlerDelegate();
+public delegate Task<HandlerResult> MessageHandlerDelegate<T>(MessagingContext<T> context)
+    where T : class, IMessageContract;
 
 public interface IMessageMiddleware<T> where T : class, IMessageContract
 {
-    Task<HandlerResult> Handle<TMessagingClientOptions>(MessagingContext<T> context, MessageHandlerDelegate next)
+    Task<HandlerResult> Handle<TMessagingClientOptions>(MessagingContext<T> context, MessageHandlerDelegate<T> next)
         where TMessagingClientOptions : class, IMessagingClientOptions;
 }

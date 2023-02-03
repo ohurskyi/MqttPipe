@@ -16,12 +16,12 @@ public class UnhandledExceptionMiddleware<T> : IMessageMiddleware<T> where T : c
         _logger = logger;
     }
 
-    public async Task<HandlerResult> Handle<TMessagingClientOptions>(MessagingContext<T> context, MessageHandlerDelegate next)
+    public async Task<HandlerResult> Handle<TMessagingClientOptions>(MessagingContext<T> context, MessageHandlerDelegate<T> next)
         where TMessagingClientOptions : class, IMessagingClientOptions
     {
         try
         {
-            return await next();
+            return await next(context);
         }
         catch (Exception e)
         {

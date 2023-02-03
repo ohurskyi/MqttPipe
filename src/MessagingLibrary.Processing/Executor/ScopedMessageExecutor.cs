@@ -1,6 +1,7 @@
 using MessagingLibrary.Core.Configuration;
 using MessagingLibrary.Core.Contexts;
 using MessagingLibrary.Core.Messages;
+using MessagingLibrary.Processing.Middlewares;
 using MessagingLibrary.Processing.Strategy;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,9 +24,9 @@ namespace MessagingLibrary.Processing.Executor
             if (messagingContextFactory.TryGetContext(message, out var context))
             {
                 var messageType = context.Message.GetType();
-                var constructedType = typeof(MessageHandlingStrategy<>).MakeGenericType(messageType);
-                var handlingStrategyGenericBase = (MessageHandlingStrategyBase)scope.ServiceProvider.GetRequiredService(constructedType);
-                await handlingStrategyGenericBase.Handle<TMessagingClientOptions>(context);
+                var constructedType = typeof(IPipeline<>).MakeGenericType(messageType);
+                var pipeline = (IPipeline)scope.ServiceProvider.GetRequiredService(constructedType);
+                await pipeline.Process<TMessagingClientOptions>(context);
             }
         }
     }

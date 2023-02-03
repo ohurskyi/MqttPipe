@@ -20,10 +20,10 @@ public class PublishMiddleware<T> : IMessageMiddleware<T> where T : class, IMess
         _serviceFactory = serviceFactory;
     }
 
-    public async Task<HandlerResult> Handle<TMessagingClientOptions>(MessagingContext<T> context, MessageHandlerDelegate next)
+    public async Task<HandlerResult> Handle<TMessagingClientOptions>(MessagingContext<T> context, MessageHandlerDelegate<T> next)
         where TMessagingClientOptions : class, IMessagingClientOptions
     {
-        var result = await next();
+        var result = await next(context);
         var integrationEvents = result.ExecutionResults.OfType<IntegrationEventResult>().ToList();
         var integrationEventsCount = integrationEvents.Count;
         if (integrationEventsCount <= 0) return result;

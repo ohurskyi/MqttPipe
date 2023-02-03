@@ -22,9 +22,9 @@ public class ReplyMiddleware<T>: IMessageMiddleware<T> where T : class, IMessage
         _messageSerializer = messageSerializer;
     }
 
-    public async Task<HandlerResult> Handle<TMessagingClientOptions>(MessagingContext<T> context, MessageHandlerDelegate next) where TMessagingClientOptions : class, IMessagingClientOptions
+    public async Task<HandlerResult> Handle<TMessagingClientOptions>(MessagingContext<T> context, MessageHandlerDelegate<T> next) where TMessagingClientOptions : class, IMessagingClientOptions
     {
-        var result = await next();
+        var result = await next(context);
         var replyResults = result.ExecutionResults.OfType<ReplyResult>().ToList();
         var replyResultsCount = replyResults.Count;
         if (replyResultsCount <= 0) return result;
