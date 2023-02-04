@@ -22,7 +22,7 @@ public static class HandlerFactoryServiceCollectionExtensions
         where TMessagingClientOptions : IMessagingClientOptions
     {
         serviceCollection.TryAddTransient<IMessagingContextFactory, MessagingContextFactory>();
-        serviceCollection.TryAddSingleton<IMessageSerializer, MessageSerializer>();
+        serviceCollection.TryAddSingleton<IMessageSerializer, MessageSerializerTest>();
         serviceCollection.TryAddSingleton<IContractsProvider, ContractsProvider>();
     }
 
