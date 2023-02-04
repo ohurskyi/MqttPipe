@@ -7,7 +7,7 @@ namespace MessagingLibrary.Core.Serialization;
 
 public class MessageSerializerTest : IMessageSerializer
 {
-    private static readonly JsonSerializerSettings _serializerSettings =  new()
+    private static readonly JsonSerializerSettings SerializerSettings =  new()
     {
         ContractResolver = new CamelCasePropertyNamesContractResolver(),
         TypeNameHandling = TypeNameHandling.None
@@ -15,24 +15,24 @@ public class MessageSerializerTest : IMessageSerializer
 
     public string Serialize(IMessageContract msg)
     {
-        var messageWrapper = new MessageWrapper
+        var messageWrapper = new SerializedMessage
         {
             MessageType = msg.GetType().AssemblyQualifiedName,
-            Body = JsonConvert.SerializeObject(msg, _serializerSettings)
+            Body = JsonConvert.SerializeObject(msg, SerializerSettings)
         };
         
-        var json = JsonConvert.SerializeObject(messageWrapper, _serializerSettings);
+        var json = JsonConvert.SerializeObject(messageWrapper, SerializerSettings);
 
         return json;
     }
 
     public IMessageContract Deserialize(string payload)
     {
-        var messageWrapper = JsonConvert.DeserializeObject<MessageWrapper>(payload, _serializerSettings);
+        var messageWrapper = JsonConvert.DeserializeObject<SerializedMessage>(payload, SerializerSettings);
 
         var msgType = Type.GetType(messageWrapper.MessageType);
         
-        var messageContract = (IMessageContract)JsonConvert.DeserializeObject(messageWrapper.Body, msgType, _serializerSettings);
+        var messageContract = (IMessageContract)JsonConvert.DeserializeObject(messageWrapper.Body, msgType, SerializerSettings);
 
         return messageContract;
     }
