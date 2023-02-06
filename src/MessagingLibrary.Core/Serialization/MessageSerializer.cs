@@ -1,4 +1,3 @@
-using System.Runtime.Serialization;
 using MessagingLibrary.Core.Messages;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -7,11 +6,18 @@ namespace MessagingLibrary.Core.Serialization;
 
 public class MessageSerializerTest : IMessageSerializer
 {
-    private static readonly JsonSerializerSettings SerializerSettings =  new()
+    private static readonly JsonSerializerSettings SerializerSettings = new()
     {
         ContractResolver = new CamelCasePropertyNamesContractResolver(),
         TypeNameHandling = TypeNameHandling.None
     };
+
+    private readonly IContractsProvider _contractsProvider;
+
+    public MessageSerializerTest(IContractsProvider contractsProvider)
+    {
+        _contractsProvider = contractsProvider;
+    }
 
     public string Serialize(IMessageContract msg)
     {
@@ -28,46 +34,13 @@ public class MessageSerializerTest : IMessageSerializer
 
     public IMessageContract Deserialize(string payload)
     {
-        var messageWrapper = JsonConvert.DeserializeObject<SerializedMessage>(payload, SerializerSettings);
+        var serializedMessage = JsonConvert.DeserializeObject<SerializedMessage>(payload, SerializerSettings);
 
-        var msgType = Type.GetType(messageWrapper.MessageType);
+        if (!_contractsProvider.TryResolveContract(serializedMessage.MessageType, out var type)) return null;
         
-        var messageContract = (IMessageContract)JsonConvert.DeserializeObject(messageWrapper.Body, msgType, SerializerSettings);
+        var messageContract = (IMessageContract)JsonConvert.DeserializeObject(serializedMessage.Body, type, SerializerSettings);
 
         return messageContract;
-    }
-}
 
-public class MessageSerializer : IMessageSerializer
-{
-    private readonly JsonSerializerSettings _serializerSettings;
-
-    public MessageSerializer(IContractsProvider contractsProvider)
-    {
-        _serializerSettings = new()
-        {
-            ContractResolver = new CamelCasePropertyNamesContractResolver(),
-            TypeNameHandling = TypeNameHandling.Auto,
-            SerializationBinder = new KnownMessageTypesAssemblyBinder(contractsProvider)
-        };
-    }
-
-    public string Serialize(IMessageContract messageContract)
-    {
-        var result =  JsonConvert.SerializeObject(messageContract, typeof(IMessageContract), _serializerSettings);
-        return result;
-    }
-
-    public IMessageContract Deserialize(string payload)
-    {
-        try
-        {
-            var contract = (IMessageContract)JsonConvert.DeserializeObject(payload, _serializerSettings);
-            return contract;
-        }
-        catch (JsonSerializationException ex)
-        {
-            throw new SerializationException($"Message can not be deserialized. Payload: {payload}", ex);
-        }
     }
 }

@@ -1,5 +1,4 @@
 using MessagingLibrary.Core.Clients;
-using MessagingLibrary.Core.Extensions;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Serialization;
 using MqttPipe.Extensions;
