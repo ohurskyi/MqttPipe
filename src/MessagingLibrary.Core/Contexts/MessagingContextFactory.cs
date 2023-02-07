@@ -1,18 +1,15 @@
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Serialization;
-using Microsoft.Extensions.Logging;
 
 namespace MessagingLibrary.Core.Contexts;
 
 public class MessagingContextFactory : IMessagingContextFactory
 {
     private readonly IMessageSerializer _messageSerializer;
-    private readonly ILogger<MessagingContextFactory> _logger;
 
-    public MessagingContextFactory(IMessageSerializer messageSerializer, ILogger<MessagingContextFactory> logger)
+    public MessagingContextFactory(IMessageSerializer messageSerializer)
     {
         _messageSerializer = messageSerializer;
-        _logger = logger;
     }
 
     public bool TryGetContext(IMessage message, out MessagingContext messagingContext, out string serializedMessageType)
