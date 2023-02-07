@@ -8,7 +8,7 @@ using Shooting.Domain.Infrastructure;
 
 namespace Shooting.Domain.Handlers.GetTargetLayers;
 
-public class GetTargetLayersMessageHandler : IMessageHandlerGeneric<GetTargetLayersRequest>
+public class GetTargetLayersMessageHandler : IMessageHandler<GetTargetLayersRequest>
 {
     private readonly TargetLayersStorage _targetLayersStorage;
     private readonly ILogger<GetTargetLayersMessageHandler> _logger;

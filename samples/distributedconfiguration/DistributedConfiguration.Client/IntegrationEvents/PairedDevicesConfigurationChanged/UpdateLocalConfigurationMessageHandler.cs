@@ -5,7 +5,7 @@ using MessagingLibrary.Core.Results;
 
 namespace DistributedConfiguration.Client.IntegrationEvents.PairedDevicesConfigurationChanged;
 
-public class UpdateLocalConfigurationMessageHandler : IMessageHandlerGeneric<DevicesConfigurationChangedContract>
+public class UpdateLocalConfigurationMessageHandler : IMessageHandler<DevicesConfigurationChangedContract>
 {
     private readonly ILogger<UpdateLocalConfigurationMessageHandler> _logger;
 

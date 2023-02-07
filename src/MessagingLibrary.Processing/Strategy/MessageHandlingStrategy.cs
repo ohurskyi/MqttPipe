@@ -28,7 +28,7 @@ public class MessageHandlingStrategy<T> where T : class, IMessageContract
         return handlerResult;
     }
 
-    private async Task<HandlerResult> HandleCore(MessagingContext<T> messagingContext, IEnumerable<IMessageHandlerGeneric<T>> handlers)
+    private async Task<HandlerResult> HandleCore(MessagingContext<T> messagingContext, IEnumerable<IMessageHandler<T>> handlers)
     {
         var executionResults = new List<IExecutionResult>();
         foreach (var handler in handlers)

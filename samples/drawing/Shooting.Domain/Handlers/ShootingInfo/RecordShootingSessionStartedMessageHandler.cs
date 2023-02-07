@@ -11,7 +11,7 @@ using Shooting.Domain.Events.ShootingStartedEvent;
 
 namespace Shooting.Domain.Handlers.ShootingInfo;
 
-public class RecordShootingSessionStartedMessageHandler :  IMessageHandlerGeneric<ShootingInfoContract> 
+public class RecordShootingSessionStartedMessageHandler :  IMessageHandler<ShootingInfoContract> 
 {
     private readonly ILogger<RecordShootingSessionStartedMessageHandler> _logger;
     private readonly IMediator _mediator;

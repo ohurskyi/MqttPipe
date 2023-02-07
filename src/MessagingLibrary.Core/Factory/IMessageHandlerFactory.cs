@@ -10,6 +10,6 @@ public interface IMessageHandlerFactory<TMessagingClientOptions> where TMessagin
     int RegisterHandler<THandler>(string topic) where THandler : class, IMessageHandler;
     int RemoveHandler<THandler>(string topic) where THandler : class, IMessageHandler;
     int RemoveHandler(Type handlerType, string topic);
-    IEnumerable<IMessageHandlerGeneric<T>> GetHandlers<T>(string topic, ServiceFactory serviceFactory)
+    IEnumerable<IMessageHandler<T>> GetHandlers<T>(string topic, ServiceFactory serviceFactory)
         where T : class, IMessageContract;
 }

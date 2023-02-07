@@ -11,7 +11,7 @@ using Shooting.Domain.Models;
 
 namespace Shooting.Domain.Handlers.ShootingInfo;
 
-public class CreateTargetLayerMessageHandler : IMessageHandlerGeneric<ShootingInfoContract>
+public class CreateTargetLayerMessageHandler : IMessageHandler<ShootingInfoContract>
 {
     private readonly ILogger<CreateTargetLayerMessageHandler> _logger;
     private readonly IMediator _mediator;

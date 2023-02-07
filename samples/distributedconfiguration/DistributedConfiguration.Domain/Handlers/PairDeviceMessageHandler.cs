@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DistributedConfiguration.Domain.Handlers;
 
-public class PairDeviceMessageHandler : IMessageHandlerGeneric<PairDeviceContract>
+public class PairDeviceMessageHandler : IMessageHandler<PairDeviceContract>
 {
     private readonly ILogger<PairDeviceMessageHandler> _logger;
 

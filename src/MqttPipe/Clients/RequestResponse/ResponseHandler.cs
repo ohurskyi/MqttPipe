@@ -5,7 +5,7 @@ using MessagingLibrary.Core.Results;
 
 namespace MqttPipe.Clients.RequestResponse;
 
-public class ResponseHandler<T> : IMessageHandlerGeneric<T> where T: class, IMessageResponse
+public class ResponseHandler<T> : IMessageHandler<T> where T: class, IMessageResponse
 {
     private readonly PendingResponseTracker<T> _pendingResponseTracker;
 

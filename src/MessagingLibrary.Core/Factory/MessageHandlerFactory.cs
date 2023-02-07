@@ -37,12 +37,12 @@ public class MessageHandlerFactory<TMessagingClientOptions> : IMessageHandlerFac
         return RemoveInner(handlerType, topic);
     }
 
-    public IEnumerable<IMessageHandlerGeneric<T>> GetHandlers<T>(string topic, ServiceFactory serviceFactory) where T : class, IMessageContract
+    public IEnumerable<IMessageHandler<T>> GetHandlers<T>(string topic, ServiceFactory serviceFactory) where T : class, IMessageContract
     {
         var instances = _handlersMap
             .Where(k => _topicFilterComparer.IsMatch(topic, k.Key))
             .SelectMany(k => k.Value.Keys)
-            .Select(serviceFactory.GetInstance<IMessageHandlerGeneric<T>>)
+            .Select(serviceFactory.GetInstance<IMessageHandler<T>>)
             .ToList();
         return instances;
     }

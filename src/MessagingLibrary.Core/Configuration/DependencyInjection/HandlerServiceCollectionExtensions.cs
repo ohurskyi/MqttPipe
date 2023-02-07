@@ -33,7 +33,7 @@ public static class HandlerServiceCollectionExtensions
     private static bool IsGenericMessageHandler(Type type)
     {
         var interfaces = type.GetInterfaces();
-        var match = interfaces.Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IMessageHandlerGeneric<>));
+        var match = interfaces.Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IMessageHandler<>));
         return match;
     }
 }

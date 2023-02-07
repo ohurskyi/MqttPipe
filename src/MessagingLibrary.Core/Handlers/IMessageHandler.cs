@@ -8,7 +8,7 @@ public interface IMessageHandler
 {
 }
 
-public interface IMessageHandlerGeneric<T> : IMessageHandler
+public interface IMessageHandler<T> : IMessageHandler
     where T : class, IMessageContract
 {
     Task<IExecutionResult> HandleAsync(MessagingContext<T> messagingContext);

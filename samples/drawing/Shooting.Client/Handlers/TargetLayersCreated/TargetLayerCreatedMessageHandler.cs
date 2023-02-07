@@ -7,7 +7,7 @@ using Shooting.Contracts.TargetLayers;
 
 namespace Shooting.Client.Handlers.TargetLayersCreated;
 
-public class TargetLayerCreatedMessageHandler : IMessageHandlerGeneric<TargetLayersCreatedContract>
+public class TargetLayerCreatedMessageHandler : IMessageHandler<TargetLayersCreatedContract>
 {
     private readonly ILogger<TargetLayerCreatedMessageHandler> _logger;
 
