@@ -1,13 +1,7 @@
 using System.Collections.Concurrent;
 using MessagingLibrary.Core.Messages;
 
-namespace MessagingLibrary.Core.Serialization;
-
-public interface IMessageTypesResolver
-{
-    Type ResolveContractType(string typeName);
-    string ResolveContractName(IMessageContract messageContract);
-}
+namespace MessagingLibrary.Core.Resolvers;
 
 public class MessageTypesResolver : IMessageTypesResolver
 {

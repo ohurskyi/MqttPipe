@@ -1,5 +1,6 @@
 ﻿using MessagingLibrary.Core.Contexts;
 using MessagingLibrary.Core.Factory;
+using MessagingLibrary.Core.Resolvers;
 using MessagingLibrary.Core.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;

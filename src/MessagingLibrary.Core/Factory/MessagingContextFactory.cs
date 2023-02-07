@@ -1,7 +1,8 @@
+using MessagingLibrary.Core.Contexts;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Serialization;
 
-namespace MessagingLibrary.Core.Contexts;
+namespace MessagingLibrary.Core.Factory;
 
 public class MessagingContextFactory : IMessagingContextFactory
 {

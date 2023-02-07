@@ -1,4 +1,4 @@
-﻿namespace MessagingLibrary.Core.Messages;
+﻿namespace MessagingLibrary.Core.Contexts;
 
 public interface IResponseContext
 {

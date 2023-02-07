@@ -1,4 +1,5 @@
 using MessagingLibrary.Core.Messages;
+using MessagingLibrary.Core.Resolvers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
