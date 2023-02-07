@@ -7,16 +7,14 @@ namespace MessagingLibrary.Processing.Middlewares;
 
 public interface IPipeline
 {
-    Task Process<TMessagingClientOptions>(object ctx) where TMessagingClientOptions : class, IMessagingClientOptions;
+    Task Process<TMessagingClientOptions>(MessagingContext messagingContext) where TMessagingClientOptions : class, IMessagingClientOptions;
 }
 
 public interface IPipeline<T> : IPipeline
     where T : class, IMessageContract
 {
-    Task IPipeline.Process<TMessagingClientOptions>(object ctx)
-    {
-        return Process<TMessagingClientOptions>((MessagingContext<T>)ctx);
-    }
+    Task IPipeline.Process<TMessagingClientOptions>(MessagingContext messagingContext) 
+        => Process<TMessagingClientOptions>((MessagingContext<T>)messagingContext);
 
     Task Process<TMessagingClientOptions>(MessagingContext<T> messagingContext)
         where TMessagingClientOptions : class, IMessagingClientOptions;
