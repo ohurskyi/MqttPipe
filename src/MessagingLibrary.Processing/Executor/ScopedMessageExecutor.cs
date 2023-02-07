@@ -23,15 +23,15 @@ namespace MessagingLibrary.Processing.Executor
         {
             using var scope = _serviceScopeFactory.CreateScope();
             var messagingContextFactory = scope.ServiceProvider.GetRequiredService<IMessagingContextFactory>();
-            if (messagingContextFactory.TryGetContext(message, out var context))
+            if (messagingContextFactory.TryGetContext(message, out var context, out var serializedMessageType))
             {
                 var messageType = context.Message.GetType();
                 var constructedType = typeof(IPipeline<>).MakeGenericType(messageType);
                 var pipeline = (IPipeline)scope.ServiceProvider.GetRequiredService(constructedType);
                 await pipeline.Process<TMessagingClientOptions>(context);
             }
-            
-            _logger.LogError("Message type could not be retrieved.");
+
+            _logger.LogError("Message type : {value} could not be resolved.", serializedMessageType);
         }
     }
 }

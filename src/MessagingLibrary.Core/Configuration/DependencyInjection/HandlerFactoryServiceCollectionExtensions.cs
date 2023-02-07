@@ -22,8 +22,8 @@ public static class HandlerFactoryServiceCollectionExtensions
         where TMessagingClientOptions : IMessagingClientOptions
     {
         serviceCollection.TryAddTransient<IMessagingContextFactory, MessagingContextFactory>();
-        serviceCollection.TryAddSingleton<IMessageSerializer, MessageSerializerTest>();
-        serviceCollection.TryAddSingleton<IContractsProvider, ContractsProvider>();
+        serviceCollection.TryAddTransient<IMessageSerializer, MessageSerializer>();
+        serviceCollection.TryAddSingleton<IMessageTypesResolver, MessageTypesResolver>();
     }
 
     private static IServiceCollection AddRequiredServiceResolvingFactory(this IServiceCollection serviceCollection)

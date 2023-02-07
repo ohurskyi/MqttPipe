@@ -15,18 +15,20 @@ public class MessagingContextFactory : IMessagingContextFactory
         _logger = logger;
     }
 
-    public bool TryGetContext(IMessage message, out MessagingContext messagingContext)
+    public bool TryGetContext(IMessage message, out MessagingContext messagingContext, out string serializedMessageType)
     {
-        var messageContract = _messageSerializer.Deserialize(message.Payload);
+        var (messageContract, messageType) = _messageSerializer.Deserialize(message.Payload);
         if (messageContract == null)
         {
             messagingContext = null;
+            serializedMessageType = messageType;
             return false;
-        }
+        }   
 
         var constructedType = typeof(MessagingContext<>).MakeGenericType(messageContract.GetType());
         var instance = (MessagingContext)Activator.CreateInstance(constructedType, messageContract, message.Topic, message.ReplyTopic, message.CorrelationId);
         messagingContext = instance;
+        serializedMessageType = messageType;
         return true;
     }
 }

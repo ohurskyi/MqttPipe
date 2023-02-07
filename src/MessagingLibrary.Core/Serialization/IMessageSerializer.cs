@@ -5,5 +5,5 @@ namespace MessagingLibrary.Core.Serialization;
 public interface IMessageSerializer
 {
     string Serialize(IMessageContract messageContract);
-    IMessageContract Deserialize(string payload);
+    (IMessageContract msg, string messageType) Deserialize(string payload);
 }

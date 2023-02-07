@@ -4,5 +4,5 @@ namespace MessagingLibrary.Core.Contexts;
 
 public interface IMessagingContextFactory
 {
-    bool TryGetContext(IMessage message, out MessagingContext messagingContext);
+    bool TryGetContext(IMessage message, out MessagingContext messagingContext, out string serializedMessageType);
 }

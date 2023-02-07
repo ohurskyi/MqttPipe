@@ -4,7 +4,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace MessagingLibrary.Core.Serialization;
 
-public class MessageSerializerTest : IMessageSerializer
+public class MessageSerializer : IMessageSerializer
 {
     private static readonly JsonSerializerSettings SerializerSettings = new()
     {
@@ -12,18 +12,18 @@ public class MessageSerializerTest : IMessageSerializer
         TypeNameHandling = TypeNameHandling.None
     };
 
-    private readonly IContractsProvider _contractsProvider;
+    private readonly IMessageTypesResolver _messageTypesResolver;
 
-    public MessageSerializerTest(IContractsProvider contractsProvider)
+    public MessageSerializer(IMessageTypesResolver messageTypesResolver)
     {
-        _contractsProvider = contractsProvider;
+        _messageTypesResolver = messageTypesResolver;
     }
 
     public string Serialize(IMessageContract msg)
     {
         var messageWrapper = new SerializedMessage
         {
-            MessageType = msg.GetType().AssemblyQualifiedName,
+            MessageType = _messageTypesResolver.ResolveContractName(msg),
             Body = JsonConvert.SerializeObject(msg, SerializerSettings)
         };
         
@@ -32,15 +32,17 @@ public class MessageSerializerTest : IMessageSerializer
         return json;
     }
 
-    public IMessageContract Deserialize(string payload)
+    public (IMessageContract msg, string messageType) Deserialize(string payload)
     {
         var serializedMessage = JsonConvert.DeserializeObject<SerializedMessage>(payload, SerializerSettings);
 
-        if (!_contractsProvider.TryResolveContract(serializedMessage.MessageType, out var type)) return null;
+        var type = _messageTypesResolver.ResolveContractType(serializedMessage.MessageType);
+
+        if (type == null) return (null, serializedMessage.MessageType);
         
         var messageContract = (IMessageContract)JsonConvert.DeserializeObject(serializedMessage.Body, type, SerializerSettings);
 
-        return messageContract;
+        return (messageContract, serializedMessage.MessageType);
 
     }
 }
