@@ -1,4 +1,3 @@
-using System.Runtime.Serialization;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Serialization;
 using Microsoft.Extensions.Logging;
@@ -18,19 +17,16 @@ public class MessagingContextFactory : IMessagingContextFactory
 
     public bool TryGetContext(IMessage message, out MessagingContext messagingContext)
     {
-        try
+        var messageContract = _messageSerializer.Deserialize(message.Payload);
+        if (messageContract == null)
         {
-            var msg = _messageSerializer.Deserialize(message.Payload);
-            var constructedType = typeof(MessagingContext<>).MakeGenericType(msg.GetType());
-            var instance = (MessagingContext)Activator.CreateInstance(constructedType, msg, message.Topic, message.ReplyTopic, message.CorrelationId);
-            messagingContext = instance;
-            return true;
-        }
-        catch (SerializationException ex)
-        {
-            _logger.LogError(ex, "Message type could not be retrieved.");
             messagingContext = null;
             return false;
         }
+
+        var constructedType = typeof(MessagingContext<>).MakeGenericType(messageContract.GetType());
+        var instance = (MessagingContext)Activator.CreateInstance(constructedType, messageContract, message.Topic, message.ReplyTopic, message.CorrelationId);
+        messagingContext = instance;
+        return true;
     }
 }

@@ -2,8 +2,8 @@ using MessagingLibrary.Core.Configuration;
 using MessagingLibrary.Core.Contexts;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Processing.Middlewares;
-using MessagingLibrary.Processing.Strategy;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace MessagingLibrary.Processing.Executor
 {
@@ -11,10 +11,12 @@ namespace MessagingLibrary.Processing.Executor
         where TMessagingClientOptions: class, IMessagingClientOptions
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly ILogger<ScopedMessageExecutor<TMessagingClientOptions>> _logger;
 
-        public ScopedMessageExecutor(IServiceScopeFactory serviceScopeFactory)
+        public ScopedMessageExecutor(IServiceScopeFactory serviceScopeFactory, ILogger<ScopedMessageExecutor<TMessagingClientOptions>> logger)
         {
             _serviceScopeFactory = serviceScopeFactory;
+            _logger = logger;
         }
 
         public async Task ExecuteAsync(IMessage message)
@@ -28,6 +30,8 @@ namespace MessagingLibrary.Processing.Executor
                 var pipeline = (IPipeline)scope.ServiceProvider.GetRequiredService(constructedType);
                 await pipeline.Process<TMessagingClientOptions>(context);
             }
+            
+            _logger.LogError("Message type could not be retrieved.");
         }
     }
 }
