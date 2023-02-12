@@ -4,12 +4,13 @@ using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
 using MessagingLibrary.Processing.Middlewares;
 using Microsoft.Extensions.Logging;
+using MqttPipe.Configuration.Configuration;
 
 namespace MqttPipe.Middlewares;
 
 public class LoggingMiddleware<T, V> : IMessageMiddleware<T, V> 
     where T : class, IMessageContract
-    where V: class, IMessagingClientOptions
+    where V: class, IMqttMessagingClientOptions
 {
     private readonly ILogger<LoggingMiddleware<T, V>> _logger;
 
@@ -18,13 +19,13 @@ public class LoggingMiddleware<T, V> : IMessageMiddleware<T, V>
         _logger = logger;
     }
 
-    public async Task<HandlerResult> Handle(MessagingContext<T> context, MessageHandlerDelegate<T> next)
+    public async Task<HandlerResult> Handle(MessagingContext<T> context, V messagingClientOptions, MessageHandlerDelegate<T, V> next)
     {
         var msgType = typeof(T).Name;
         var topic = context.Topic;
-        _logger.LogDebug("Begin {msg} handling from topic: {topic}", msgType, topic);
-        var result = await next(context);
-        _logger.LogDebug("End {msg} handling from topic: {topic}", msgType, topic);
+        _logger.LogDebug("Begin handling {msg} on topic: {topic} from client {clientAddress}", msgType, topic, messagingClientOptions.MqttBrokerConnectionOptions.Host);
+        var result = await next(context, messagingClientOptions);
+        _logger.LogDebug("End handling {msg} on topic: {topic} from client {clientAddress}", msgType, topic, messagingClientOptions.MqttBrokerConnectionOptions.Host);
         return result;
     }
 }

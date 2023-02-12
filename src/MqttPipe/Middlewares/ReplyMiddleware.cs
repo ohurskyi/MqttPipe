@@ -24,9 +24,9 @@ public class ReplyMiddleware<T, V>: IMessageMiddleware<T, V>
         _messageSerializer = messageSerializer;
     }
 
-    public async Task<HandlerResult> Handle(MessagingContext<T> context, MessageHandlerDelegate<T> next)
+    public async Task<HandlerResult> Handle(MessagingContext<T> context, V messagingClientOptions, MessageHandlerDelegate<T, V> next)
     {
-        var result = await next(context);
+        var result = await next(context, messagingClientOptions);
         var replyResults = result.ExecutionResults.OfType<ReplyResult>().ToList();
         var replyResultsCount = replyResults.Count;
         if (replyResultsCount <= 0) return result;

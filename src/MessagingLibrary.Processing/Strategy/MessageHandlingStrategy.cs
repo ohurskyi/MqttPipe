@@ -18,7 +18,7 @@ public class MessageHandlingStrategy<T, V>
         _serviceFactory = serviceFactory;
     }
 
-    public async Task<HandlerResult> HandleAsync(MessagingContext<T> messagingContext)
+    public async Task<HandlerResult> HandleAsync(MessagingContext<T> messagingContext, V messagingClientOptions)
     {
         var factory = _serviceFactory.GetInstance<IMessageHandlerFactory<V>>();
         

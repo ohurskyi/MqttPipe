@@ -35,7 +35,7 @@ namespace MessagingLibrary.Processing.Executor
             var messageType = context.Message.GetType();
             var constructedType = typeof(IPipeline<,>).MakeGenericType(messageType, typeof(TMessagingClientOptions));
             var pipeline = (IPipeline)scope.ServiceProvider.GetRequiredService(constructedType);
-            await pipeline.Process(context);
+            await pipeline.Process(context, _messagingClientOptions);
         }
     }
 }

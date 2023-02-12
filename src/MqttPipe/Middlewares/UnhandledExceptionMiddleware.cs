@@ -18,11 +18,11 @@ public class UnhandledExceptionMiddleware<T, V> : IMessageMiddleware<T, V>
         _logger = logger;
     }
 
-    public async Task<HandlerResult> Handle(MessagingContext<T> context, MessageHandlerDelegate<T> next)
+    public async Task<HandlerResult> Handle(MessagingContext<T> context, V messagingClientOptions, MessageHandlerDelegate<T, V> next)
     {
         try
         {
-            return await next(context);
+            return await next(context, messagingClientOptions);
         }
         catch (Exception e)
         {

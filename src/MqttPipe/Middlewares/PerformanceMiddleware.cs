@@ -19,10 +19,10 @@ public class PerformanceMiddleware<T, V> : IMessageMiddleware<T, V>
         _logger = logger;
     }
 
-    public async Task<HandlerResult> Handle(MessagingContext<T> context, MessageHandlerDelegate<T> next)
+    public async Task<HandlerResult> Handle(MessagingContext<T> context, V messagingClientOptions, MessageHandlerDelegate<T, V> next)
     {
         var sw = Stopwatch.StartNew();
-        var result = await next(context);
+        var result = await next(context, messagingClientOptions);
         var el = sw.Elapsed;
         if (el.TotalMilliseconds > 666)
         {
