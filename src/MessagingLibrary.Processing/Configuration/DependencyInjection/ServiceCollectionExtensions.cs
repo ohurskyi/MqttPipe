@@ -23,6 +23,8 @@ public static class ServiceCollectionExtensions
         where TMessagingClientOptions: class, IMessagingClientOptions
     {
         serviceCollection.AddMessageHandlerFactory<TMessagingClientOptions>();
+
+        serviceCollection.AddMessageSerialization();
         
         serviceCollection.TryAddSingleton<IMessageExecutor<TMessagingClientOptions>, ScopedMessageExecutor<TMessagingClientOptions>>();
         
