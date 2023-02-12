@@ -5,13 +5,13 @@ namespace MessagingLibrary.Core.Results;
 
 public class ReplyResult : SuccessfulResult
 {
-    public ReplyResult(IMessageResponse messagePayload, IResponseContext responseContext)
+    public ReplyResult(IMessageResponse messageMessageResponse, IResponseContext responseContext)
     {
-        Payload = messagePayload;
+        MessageResponse = messageMessageResponse;
         ResponseContext = responseContext;
     }
 
-    public IMessageResponse Payload { get; }
+    public IMessageResponse MessageResponse { get; }
 
     public IResponseContext ResponseContext { get; }
 }

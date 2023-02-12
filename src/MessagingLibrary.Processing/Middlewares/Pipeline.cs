@@ -5,34 +5,34 @@ using MessagingLibrary.Processing.Strategy;
 
 namespace MessagingLibrary.Processing.Middlewares;
 
-public class Pipeline<T> : IPipeline<T> where T : class, IMessageContract
+public class Pipeline<T, V> : IPipeline<T, V> 
+    where T : class, IMessageContract
+    where V: class, IMessagingClientOptions
 {
-    private readonly IMessageMiddleware<T>[] _middlewares;
-    private readonly MessageHandlingStrategy<T> _strategy;
+    private readonly IMessageMiddleware<T, V>[] _middlewares;
+    private readonly MessageHandlingStrategy<T, V> _strategy;
 
-    public Pipeline(IEnumerable<IMessageMiddleware<T>> middlewares, MessageHandlingStrategy<T> strategy)
+    public Pipeline(IEnumerable<IMessageMiddleware<T, V>> middlewares, MessageHandlingStrategy<T, V> strategy)
     {
         _strategy = strategy;
         _middlewares = middlewares.ToArray();
     }
 
-    public async Task Process<TMessagingClientOptions>(MessagingContext<T> messagingContext)  
-        where TMessagingClientOptions : class, IMessagingClientOptions
+    public async Task Process(MessagingContext<T> messagingContext)
     {
-        MessageHandlerDelegate<T> lastPipe = _strategy.HandleAsync<TMessagingClientOptions>;
-        var messageHandler = BuildPipeline<TMessagingClientOptions>(_middlewares, lastPipe);
+        MessageHandlerDelegate<T> lastPipe = _strategy.HandleAsync;
+        var messageHandler = BuildPipeline(_middlewares, lastPipe);
         await messageHandler(messagingContext);
     }
 
-    private static MessageHandlerDelegate<T> BuildPipeline<TMessagingClientOptions>(
-        IMessageMiddleware<T>[] middlewares,
+    private static MessageHandlerDelegate<T> BuildPipeline(
+        IMessageMiddleware<T, V>[] middlewares,
         MessageHandlerDelegate<T> @delegate)
-        where TMessagingClientOptions : class, IMessagingClientOptions
     {
         for (var i = middlewares.Length - 1; i >= 0; i--)
         {
             var middleware = middlewares[i];
-            MessageHandlerDelegate<T> Wrap(MessageHandlerDelegate<T> next) => context => middleware.Handle<TMessagingClientOptions>(context, next);
+            MessageHandlerDelegate<T> Wrap(MessageHandlerDelegate<T> next) => context => middleware.Handle(context, next);
             @delegate = Wrap(@delegate);
         }
 

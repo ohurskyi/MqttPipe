@@ -23,11 +23,11 @@ public static class MessagingPipelineServiceCollectionExtensions
     {
         serviceCollection.TryAddEnumerable(new[]
         {
-            ServiceDescriptor.Transient(typeof(IMessageMiddleware<>), typeof(UnhandledExceptionMiddleware<>)),
-            ServiceDescriptor.Transient(typeof(IMessageMiddleware<>), typeof(LoggingMiddleware<>)),
-            ServiceDescriptor.Transient(typeof(IMessageMiddleware<>), typeof(PerformanceMiddleware<>)),
-            ServiceDescriptor.Transient(typeof(IMessageMiddleware<>), typeof(PublishMiddleware<>)),
-            ServiceDescriptor.Transient(typeof(IMessageMiddleware<>), typeof(ReplyMiddleware<>)),
+            ServiceDescriptor.Transient(typeof(IMessageMiddleware<,>), typeof(UnhandledExceptionMiddleware<,>)),
+            ServiceDescriptor.Transient(typeof(IMessageMiddleware<,>), typeof(LoggingMiddleware<,>)),
+            ServiceDescriptor.Transient(typeof(IMessageMiddleware<,>), typeof(PerformanceMiddleware<,>)),
+            ServiceDescriptor.Transient(typeof(IMessageMiddleware<,>), typeof(PublishMiddleware<,>)),
+            ServiceDescriptor.Transient(typeof(IMessageMiddleware<,>), typeof(ReplyMiddleware<,>)),
         });
 
         return serviceCollection;

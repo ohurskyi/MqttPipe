@@ -7,7 +7,9 @@ using MessagingLibrary.Core.Results;
 
 namespace MessagingLibrary.Processing.Strategy;
 
-public class MessageHandlingStrategy<T> where T : class, IMessageContract
+public class MessageHandlingStrategy<T, V> 
+    where T : class, IMessageContract
+    where V: class, IMessagingClientOptions
 {
     private readonly ServiceFactory _serviceFactory;
 
@@ -16,10 +18,9 @@ public class MessageHandlingStrategy<T> where T : class, IMessageContract
         _serviceFactory = serviceFactory;
     }
 
-    public async Task<HandlerResult> HandleAsync<TMessagingClientOptions>(MessagingContext<T> messagingContext) 
-        where TMessagingClientOptions : class, IMessagingClientOptions
+    public async Task<HandlerResult> HandleAsync(MessagingContext<T> messagingContext)
     {
-        var factory = _serviceFactory.GetInstance<IMessageHandlerFactory<TMessagingClientOptions>>();
+        var factory = _serviceFactory.GetInstance<IMessageHandlerFactory<V>>();
         
         var handlers = factory.GetHandlers<T>(messagingContext.Topic, _serviceFactory);
 

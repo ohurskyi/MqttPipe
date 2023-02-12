@@ -10,19 +10,21 @@ using Microsoft.Extensions.Logging;
 
 namespace MqttPipe.Middlewares;
 
-public class ReplyMiddleware<T>: IMessageMiddleware<T> where T : class, IMessageContract 
+public class ReplyMiddleware<T, V>: IMessageMiddleware<T, V> 
+    where T : class, IMessageContract 
+    where V: class, IMessagingClientOptions
 {
-    private readonly ILogger<ReplyMiddleware<T>> _logger;
+    private readonly ILogger<ReplyMiddleware<T, V>> _logger;
     private readonly ServiceFactory _serviceFactory;
     private readonly IMessageSerializer _messageSerializer;
-    public ReplyMiddleware(ILogger<ReplyMiddleware<T>> logger, ServiceFactory serviceFactory, IMessageSerializer messageSerializer)
+    public ReplyMiddleware(ILogger<ReplyMiddleware<T, V>> logger, ServiceFactory serviceFactory, IMessageSerializer messageSerializer)
     {
         _logger = logger;
         _serviceFactory = serviceFactory;
         _messageSerializer = messageSerializer;
     }
 
-    public async Task<HandlerResult> Handle<TMessagingClientOptions>(MessagingContext<T> context, MessageHandlerDelegate<T> next) where TMessagingClientOptions : class, IMessagingClientOptions
+    public async Task<HandlerResult> Handle(MessagingContext<T> context, MessageHandlerDelegate<T> next)
     {
         var result = await next(context);
         var replyResults = result.ExecutionResults.OfType<ReplyResult>().ToList();
@@ -30,11 +32,11 @@ public class ReplyMiddleware<T>: IMessageMiddleware<T> where T : class, IMessage
         if (replyResultsCount <= 0) return result;
         
         var replyTasks = new List<Task>(replyResultsCount);
-        var messageBus = _serviceFactory.GetInstance<IMessageBus<TMessagingClientOptions>>();
+        var messageBus = _serviceFactory.GetInstance<IMessageBus<V>>();
         foreach (var replyResult in replyResults)
         {
-            _logger.LogDebug("Sending reply to topic {topicValue} of payload {type}", replyResult.ResponseContext.ReplyTopic,  replyResult.Payload.GetType().Name);
-            var replyMessage = new Message { Topic = replyResult.ResponseContext.ReplyTopic, CorrelationId = replyResult.ResponseContext.CorrelationId, Payload = _messageSerializer.Serialize(replyResult.Payload) };
+            _logger.LogDebug("Sending reply to topic {topicValue} of payload {type}", replyResult.ResponseContext.ReplyTopic,  replyResult.MessageResponse.GetType().Name);
+            var replyMessage = new Message { Topic = replyResult.ResponseContext.ReplyTopic, CorrelationId = replyResult.ResponseContext.CorrelationId, Payload = _messageSerializer.Serialize(replyResult.MessageResponse) };
             replyTasks.Add(messageBus.Publish(replyMessage));
         }
 

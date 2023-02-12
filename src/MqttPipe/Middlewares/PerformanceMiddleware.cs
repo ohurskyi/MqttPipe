@@ -8,16 +8,18 @@ using Microsoft.Extensions.Logging;
 
 namespace MqttPipe.Middlewares;
 
-public class PerformanceMiddleware<T> : IMessageMiddleware<T> where T : class, IMessageContract
+public class PerformanceMiddleware<T, V> : IMessageMiddleware<T, V> 
+    where T : class, IMessageContract
+    where V: class, IMessagingClientOptions
 {
-    private readonly ILogger<PerformanceMiddleware<T>> _logger;
+    private readonly ILogger<PerformanceMiddleware<T, V>> _logger;
 
-    public PerformanceMiddleware(ILogger<PerformanceMiddleware<T>> logger)
+    public PerformanceMiddleware(ILogger<PerformanceMiddleware<T, V>> logger)
     {
         _logger = logger;
     }
 
-    public async Task<HandlerResult> Handle<TMessagingClientOptions>(MessagingContext<T> context, MessageHandlerDelegate<T> next) where TMessagingClientOptions : class, IMessagingClientOptions
+    public async Task<HandlerResult> Handle(MessagingContext<T> context, MessageHandlerDelegate<T> next)
     {
         var sw = Stopwatch.StartNew();
         var result = await next(context);

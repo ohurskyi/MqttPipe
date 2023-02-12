@@ -9,19 +9,20 @@ using Microsoft.Extensions.Logging;
 
 namespace MqttPipe.Middlewares;
 
-public class PublishMiddleware<T> : IMessageMiddleware<T> where T : class, IMessageContract
+public class PublishMiddleware<T, V> : IMessageMiddleware<T, V> 
+    where T : class, IMessageContract
+    where V: class, IMessagingClientOptions
 {
-    private readonly ILogger<PublishMiddleware<T>> _logger;
+    private readonly ILogger<PublishMiddleware<T, V>> _logger;
     private readonly ServiceFactory _serviceFactory;
 
-    public PublishMiddleware(ILogger<PublishMiddleware<T>> logger, ServiceFactory serviceFactory)
+    public PublishMiddleware(ILogger<PublishMiddleware<T, V>> logger, ServiceFactory serviceFactory)
     {
         _logger = logger;
         _serviceFactory = serviceFactory;
     }
 
-    public async Task<HandlerResult> Handle<TMessagingClientOptions>(MessagingContext<T> context, MessageHandlerDelegate<T> next)
-        where TMessagingClientOptions : class, IMessagingClientOptions
+    public async Task<HandlerResult> Handle(MessagingContext<T> context, MessageHandlerDelegate<T> next)
     {
         var result = await next(context);
         var integrationEvents = result.ExecutionResults.OfType<IntegrationEventResult>().ToList();
@@ -29,7 +30,7 @@ public class PublishMiddleware<T> : IMessageMiddleware<T> where T : class, IMess
         if (integrationEventsCount <= 0) return result;
         
         var publishTasks = new List<Task>(integrationEventsCount);
-        var messageBus = _serviceFactory.GetInstance<IMessageBus<TMessagingClientOptions>>();
+        var messageBus = _serviceFactory.GetInstance<IMessageBus<V>>();
         
         foreach (var integrationEvent in integrationEvents)
         {

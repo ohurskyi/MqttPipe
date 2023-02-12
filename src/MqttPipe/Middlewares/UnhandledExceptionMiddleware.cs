@@ -7,17 +7,18 @@ using Microsoft.Extensions.Logging;
 
 namespace MqttPipe.Middlewares;
 
-public class UnhandledExceptionMiddleware<T> : IMessageMiddleware<T> where T : class, IMessageContract
+public class UnhandledExceptionMiddleware<T, V> : IMessageMiddleware<T, V> 
+    where T : class, IMessageContract
+    where V: class, IMessagingClientOptions
 {
-    private readonly ILogger<UnhandledExceptionMiddleware<T>> _logger;
+    private readonly ILogger<UnhandledExceptionMiddleware<T, V>> _logger;
 
-    public UnhandledExceptionMiddleware(ILogger<UnhandledExceptionMiddleware<T>> logger)
+    public UnhandledExceptionMiddleware(ILogger<UnhandledExceptionMiddleware<T, V>> logger)
     {
         _logger = logger;
     }
 
-    public async Task<HandlerResult> Handle<TMessagingClientOptions>(MessagingContext<T> context, MessageHandlerDelegate<T> next)
-        where TMessagingClientOptions : class, IMessagingClientOptions
+    public async Task<HandlerResult> Handle(MessagingContext<T> context, MessageHandlerDelegate<T> next)
     {
         try
         {

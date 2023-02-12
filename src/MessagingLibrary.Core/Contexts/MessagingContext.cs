@@ -1,3 +1,4 @@
+using MessagingLibrary.Core.Configuration;
 using MessagingLibrary.Core.Messages;
 
 namespace MessagingLibrary.Core.Contexts;
@@ -5,10 +6,11 @@ namespace MessagingLibrary.Core.Contexts;
 public class MessagingContext<T> : MessagingContext 
     where T: class, IMessageContract
 {
-    public MessagingContext(IMessageContract message, string topic, string replyTopic, Guid correlationId) : base(message, topic, replyTopic, correlationId)
+    public MessagingContext(IMessageContract message, string topic, string replyTopic, Guid correlationId) 
+        : base(message, topic, replyTopic, correlationId)
     {
     }
-
+    
     public override T Message => (T)base.Message;
 }
 
