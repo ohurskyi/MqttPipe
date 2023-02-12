@@ -32,10 +32,8 @@ public class Pipeline<T> : IPipeline<T> where T : class, IMessageContract
         for (var i = middlewares.Length - 1; i >= 0; i--)
         {
             var middleware = middlewares[i];
-            Func<MessageHandlerDelegate<T>, MessageHandlerDelegate<T>> wrap = next => 
-                context => middleware.Handle<TMessagingClientOptions>(context, next);
-
-            @delegate = wrap(@delegate);
+            MessageHandlerDelegate<T> Wrap(MessageHandlerDelegate<T> next) => context => middleware.Handle<TMessagingClientOptions>(context, next);
+            @delegate = Wrap(@delegate);
         }
 
         return @delegate;

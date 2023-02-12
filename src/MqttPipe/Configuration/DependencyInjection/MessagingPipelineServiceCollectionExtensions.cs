@@ -12,21 +12,18 @@ public static class MessagingPipelineServiceCollectionExtensions
     public static IServiceCollection AddMqttMessageProcessing<TMessagingClientOptions>(this IServiceCollection serviceCollection)
         where TMessagingClientOptions : class, IMqttMessagingClientOptions
     {
-        // test
-        serviceCollection.AddMiddlewaresNew();
-        
         return serviceCollection
             .AddMessagingPipeline<TMessagingClientOptions>()
+            .AddMiddlewares()
             .AddMqttTopicComparer()
             .AddMqttApplicationMessageReceivedHandler<TMessagingClientOptions>();
     }
 
-    public static IServiceCollection AddMiddlewaresNew(this IServiceCollection serviceCollection)
+    private static IServiceCollection AddMiddlewares(this IServiceCollection serviceCollection)
     {
         serviceCollection.TryAddEnumerable(new[]
         {
-            ServiceDescriptor.Transient(typeof(IMessageMiddleware<>),
-                typeof(UnhandledExceptionMiddleware<>)),
+            ServiceDescriptor.Transient(typeof(IMessageMiddleware<>), typeof(UnhandledExceptionMiddleware<>)),
             ServiceDescriptor.Transient(typeof(IMessageMiddleware<>), typeof(LoggingMiddleware<>)),
             ServiceDescriptor.Transient(typeof(IMessageMiddleware<>), typeof(PerformanceMiddleware<>)),
             ServiceDescriptor.Transient(typeof(IMessageMiddleware<>), typeof(PublishMiddleware<>)),
