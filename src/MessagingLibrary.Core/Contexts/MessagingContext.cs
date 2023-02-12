@@ -1,4 +1,3 @@
-using MessagingLibrary.Core.Configuration;
 using MessagingLibrary.Core.Messages;
 
 namespace MessagingLibrary.Core.Contexts;

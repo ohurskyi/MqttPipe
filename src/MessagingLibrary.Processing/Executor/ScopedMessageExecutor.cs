@@ -1,10 +1,10 @@
 using MessagingLibrary.Core.Configuration;
-using MessagingLibrary.Core.Contexts;
 using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Processing.Middlewares;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace MessagingLibrary.Processing.Executor
 {
@@ -13,9 +13,9 @@ namespace MessagingLibrary.Processing.Executor
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ILogger<ScopedMessageExecutor<TMessagingClientOptions>> _logger;
-        private readonly TMessagingClientOptions _messagingClientOptions;
+        private readonly IOptionsMonitor<TMessagingClientOptions> _messagingClientOptions;
 
-        public ScopedMessageExecutor(IServiceScopeFactory serviceScopeFactory, ILogger<ScopedMessageExecutor<TMessagingClientOptions>> logger, TMessagingClientOptions messagingClientOptions)
+        public ScopedMessageExecutor(IServiceScopeFactory serviceScopeFactory, ILogger<ScopedMessageExecutor<TMessagingClientOptions>> logger, IOptionsMonitor<TMessagingClientOptions> messagingClientOptions)
         {
             _serviceScopeFactory = serviceScopeFactory;
             _logger = logger;
@@ -35,7 +35,7 @@ namespace MessagingLibrary.Processing.Executor
             var messageType = context.Message.GetType();
             var constructedType = typeof(IPipeline<,>).MakeGenericType(messageType, typeof(TMessagingClientOptions));
             var pipeline = (IPipeline)scope.ServiceProvider.GetRequiredService(constructedType);
-            await pipeline.Process(context, _messagingClientOptions);
+            await pipeline.Process(context, _messagingClientOptions.CurrentValue);
         }
     }
 }
