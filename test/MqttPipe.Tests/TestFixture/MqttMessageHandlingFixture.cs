@@ -6,18 +6,12 @@ using System.Threading.Tasks;
 using DotNet.Testcontainers.Builders;
 using MessagingLibrary.Core.Clients;
 using MessagingLibrary.Core.Configuration.DependencyInjection;
-using MessagingLibrary.Processing.Configuration.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using MQTTnet;
-using MQTTnet.Client;
-using MQTTnet.Extensions.ManagedClient;
-using MQTTnet.Formatter;
 using MqttPipe.Clients;
 using MqttPipe.Configuration.DependencyInjection;
-using MqttPipe.Tests.Consumers;
+using MqttPipe.Services;
 using MqttPipe.Tests.Handlers;
 using MqttPipe.Tests.Modules;
 using MqttPipe.Tests.Options;
@@ -30,10 +24,6 @@ public class MqttMessageHandlingFixture : IAsyncLifetime
     private const int Port = 5000;
     private readonly MqttTestConfiguration _testConfiguration = new(Port);
     private readonly MqttTestContainer _testContainer;
-    private readonly IManagedMqttClient _managedMqttClient;
-
-    private TextWriter _writer;
-    private IServiceProvider _serviceProvider;
 
     public MqttMessageHandlingFixture()
     {
@@ -42,43 +32,25 @@ public class MqttMessageHandlingFixture : IAsyncLifetime
             .Build();
     }
 
-    public IMessageBus<TestMessagingClientOptions> MqttClient =>  _serviceProvider.GetRequiredService<IMessageBus<TestMessagingClientOptions>>();
+    public IMessageBus<TestMessagingClientOptions> MessageBus =>  ServiceProvider.GetRequiredService<IMessageBus<TestMessagingClientOptions>>();
 
-    public IServiceProvider ServiceProvider => _serviceProvider;
-
-    public async Task Connect(Func<Task> connectedHandler)
-    {
-        var hostedServices = _serviceProvider.GetServices<IHostedService>();
-        foreach (var hostedService in hostedServices)
-        {
-            await hostedService.StartAsync(CancellationToken.None);
-        }
-
-        var mqttMessagingClient = _serviceProvider.GetRequiredService<IMqttMessagingClient<TestMessagingClientOptions>>();
-        await mqttMessagingClient.WaitConnected(connectedHandler);
-    }
+    public IServiceProvider ServiceProvider { get; private set; }
 
     public async Task InitializeAsync()
     {
         await _testContainer.StartAsync().ConfigureAwait(false);
-        
-        var mqttClientOptions = new MqttClientOptionsBuilder()
-            .WithProtocolVersion(MqttProtocolVersion.V500)
-            .WithTcpServer(_testContainer.Hostname, _testContainer.Port)
-            .WithCleanSession()
-            .WithClientId($"den_client_{Guid.NewGuid()}")
-            .Build();
-
-        new ManagedMqttClientOptionsBuilder()
-            .WithClientOptions(mqttClientOptions)
-            .WithAutoReconnectDelay(TimeSpan.FromSeconds(10))
-            .Build();
-
-        _serviceProvider = BuildContainer();
+        ServiceProvider = BuildContainer();
+        ServiceProvider.UseMqttMessageReceivedHandler<TestMessagingClientOptions>();
+        var messagingHostedService = ServiceProvider.GetRequiredService<MqttMessagingHostedService<TestMessagingClientOptions>>();
+        var mqttMessagingClient = ServiceProvider.GetRequiredService<IMqttMessagingClient<TestMessagingClientOptions>>();
+        await messagingHostedService.StartAsync(CancellationToken.None);
+        await mqttMessagingClient.Connect();
     }
 
     public async Task DisposeAsync()
     {
+        var messagingHostedService = ServiceProvider.GetRequiredService<MqttMessagingHostedService<TestMessagingClientOptions>>();
+        await messagingHostedService.StopAsync(CancellationToken.None);
         _testConfiguration.Dispose();
         await _testContainer.DisposeAsync();
     }
@@ -93,14 +65,10 @@ public class MqttMessageHandlingFixture : IAsyncLifetime
         
         serviceCollection.AddMqttPipe<TestMessagingClientOptions, TesClientOptionsBuilder>(options =>
         {
-            // null
             options.MqttBrokerConnectionOptions.Host = _testContainer.Hostname;
             options.MqttBrokerConnectionOptions.Port = _testContainer.Port;
         });
         serviceCollection.AddMessageHandlers(typeof(HandlerForDeviceNumber1).Assembly);
-        serviceCollection.AddConsumerDefinitionListenerProvider<ConsumerDefinitionListenerProvider>();
-        serviceCollection.AddMessageConsumersHostedService();
-        
         return serviceCollection.BuildServiceProvider();
     }
 }

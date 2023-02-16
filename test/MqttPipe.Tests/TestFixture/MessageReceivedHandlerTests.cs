@@ -1,13 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
+using MessagingLibrary.Core.Clients;
+using MessagingLibrary.Core.Definitions.Subscriptions;
 using Microsoft.Extensions.DependencyInjection;
-using MQTTnet;
-using MQTTnet.Packets;
-using MQTTnet.Protocol;
-using MqttPipe.Configuration.DependencyInjection;
 using MqttPipe.Tests.Contracts;
 using MqttPipe.Tests.Handlers;
 using MqttPipe.Tests.Options;
@@ -29,33 +25,23 @@ public class MessageReceivedHandlerTests : IClassFixture<MqttMessageHandlingFixt
     }
 
     [Fact]
-    public async Task Received()
+    public async Task ExecuteAsync_MultiWildCardDeviceTopic_CallHandlerForAllDevices()
     {
         // Arrange
         var provider = _fixture.ServiceProvider;
-
-        Task ConnectedFunc()
-        {
-            _outputHelper.WriteLine("Connected");
-            return Task.CompletedTask;
-        }
-
-        await _fixture.Connect(ConnectedFunc);
         
-        provider.UseMqttMessageReceivedHandler<TestMessagingClientOptions>();
-
+        const string multiWildCardDeviceTopic = $"{DeviceTopicConstants.DeviceTopic}/#";
+        var topicClient = provider.GetRequiredService<ITopicClient<TestMessagingClientOptions>>();
+        await topicClient.Subscribe(new SubscriptionDefinition<HandlerForAllDeviceNumbers>(multiWildCardDeviceTopic));
+        
         var contract =  new DeviceMessageContract { Name = "Device" };
         var deviceNumber = 1;
         var publishTopic = $"{DeviceTopicConstants.DeviceTopic}/{deviceNumber}";
 
         // Act
-        _outputHelper.WriteLine("Publishing msg");
-        var client = _fixture.MqttClient;
+        var client = _fixture.MessageBus;
         await client.Publish(contract, publishTopic);
-
-        _outputHelper.WriteLine("Waiting for message to be processed...");
         await Task.Delay(TimeSpan.FromSeconds(5));
-
         var textWriter = (StringWriter)provider.GetRequiredService<TextWriter>();
         var result = textWriter.GetStringBuilder().ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.None);
         

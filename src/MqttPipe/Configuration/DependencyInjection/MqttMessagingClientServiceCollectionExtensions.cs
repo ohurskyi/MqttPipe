@@ -47,7 +47,8 @@ namespace MqttPipe.Configuration.DependencyInjection
         private static IServiceCollection AddMqttMessagingStartupServices<TMessagingClientOptions>(this IServiceCollection serviceCollection)
             where TMessagingClientOptions : class, IMqttMessagingClientOptions, new()
         {
-            serviceCollection.AddHostedService<MqttMessagingHostedService<TMessagingClientOptions>>();
+            serviceCollection.TryAddSingleton<MqttMessagingHostedService<TMessagingClientOptions>>();
+            serviceCollection.AddHostedService(pr => pr.GetRequiredService<MqttMessagingHostedService<TMessagingClientOptions>>());
             return serviceCollection;
         }
 
