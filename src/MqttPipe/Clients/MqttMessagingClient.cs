@@ -10,8 +10,6 @@ public class MqttMessagingClient<TMessagingClientOptions> : IMqttMessagingClient
 {
     private readonly IManagedMqttClient _mqttClient;
     private readonly ManagedMqttClientOptions _mqttClientOptions;
-    
-    private readonly TaskCompletionSource _taskCompletionSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
     public MqttMessagingClient(IClientOptionsBuilder<TMessagingClientOptions> clientOptionsBuilder)
     {
@@ -42,16 +40,6 @@ public class MqttMessagingClient<TMessagingClientOptions> : IMqttMessagingClient
 
         _mqttClient.ConnectedAsync += Func;
         return tcs.Task;
-    }
-
-    public Task WaitConnected(Func<Task> connectedHandler)
-    {
-        _mqttClient.ConnectedAsync += async args =>
-        {
-            await connectedHandler();
-            _taskCompletionSource.TrySetResult();
-        };
-        return _taskCompletionSource.Task;
     }
 
     public async Task StopAsync()
