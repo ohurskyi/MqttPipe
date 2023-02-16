@@ -4,7 +4,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using DotNet.Testcontainers.Builders;
+using MessagingLibrary.Core.Clients;
 using MessagingLibrary.Core.Configuration.DependencyInjection;
+using MessagingLibrary.Processing.Configuration.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -15,6 +17,7 @@ using MQTTnet.Extensions.ManagedClient;
 using MQTTnet.Formatter;
 using MqttPipe.Clients;
 using MqttPipe.Configuration.DependencyInjection;
+using MqttPipe.Tests.Consumers;
 using MqttPipe.Tests.Handlers;
 using MqttPipe.Tests.Modules;
 using MqttPipe.Tests.Options;
@@ -39,7 +42,7 @@ public class MqttMessageHandlingFixture : IAsyncLifetime
             .Build();
     }
 
-    public IMqttMessagingClient<TestMessagingClientOptions> MqttClient =>  _serviceProvider.GetRequiredService<IMqttMessagingClient<TestMessagingClientOptions>>();
+    public IMessageBus<TestMessagingClientOptions> MqttClient =>  _serviceProvider.GetRequiredService<IMessageBus<TestMessagingClientOptions>>();
 
     public IServiceProvider ServiceProvider => _serviceProvider;
 
@@ -95,6 +98,8 @@ public class MqttMessageHandlingFixture : IAsyncLifetime
             options.MqttBrokerConnectionOptions.Port = _testContainer.Port;
         });
         serviceCollection.AddMessageHandlers(typeof(HandlerForDeviceNumber1).Assembly);
+        serviceCollection.AddConsumerDefinitionListenerProvider<ConsumerDefinitionListenerProvider>();
+        serviceCollection.AddMessageConsumersHostedService();
         
         return serviceCollection.BuildServiceProvider();
     }

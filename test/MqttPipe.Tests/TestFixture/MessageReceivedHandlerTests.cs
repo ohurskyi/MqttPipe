@@ -7,6 +7,11 @@ using Microsoft.Extensions.DependencyInjection;
 using MQTTnet;
 using MQTTnet.Packets;
 using MQTTnet.Protocol;
+using MqttPipe.Configuration.DependencyInjection;
+using MqttPipe.Tests.Contracts;
+using MqttPipe.Tests.Handlers;
+using MqttPipe.Tests.Options;
+using MqttPipe.Tests.Topics;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -24,7 +29,7 @@ public class MessageReceivedHandlerTests : IClassFixture<MqttMessageHandlingFixt
     }
 
     [Fact]
-    public async Task Connected()
+    public async Task Received()
     {
         // Arrange
         var provider = _fixture.ServiceProvider;
@@ -37,29 +42,24 @@ public class MessageReceivedHandlerTests : IClassFixture<MqttMessageHandlingFixt
 
         await _fixture.Connect(ConnectedFunc);
         
-        TaskCompletionSource messageHandledCompletion = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        provider.UseMqttMessageReceivedHandler<TestMessagingClientOptions>();
 
-        const string topic = "test";
-        //await client.SubscribeAsync(topic);
-        
-        var mqttApplicationMessage = new MqttApplicationMessageBuilder()
-            .WithPayload("hello")
-            .WithTopic(topic)
-            .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
-            .Build();
+        var contract =  new DeviceMessageContract { Name = "Device" };
+        var deviceNumber = 1;
+        var publishTopic = $"{DeviceTopicConstants.DeviceTopic}/{deviceNumber}";
 
         // Act
         _outputHelper.WriteLine("Publishing msg");
         var client = _fixture.MqttClient;
-        await client.PublishAsync(mqttApplicationMessage);
+        await client.Publish(contract, publishTopic);
 
         _outputHelper.WriteLine("Waiting for message to be processed...");
-        await messageHandledCompletion.Task.ConfigureAwait(false);
+        await Task.Delay(TimeSpan.FromSeconds(5));
 
         var textWriter = (StringWriter)provider.GetRequiredService<TextWriter>();
         var result = textWriter.GetStringBuilder().ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.None);
         
         // Assert
-        Assert.NotEmpty(result);
+        Assert.Contains("Device " + nameof(HandlerForAllDeviceNumbers), result);
     }
 }
