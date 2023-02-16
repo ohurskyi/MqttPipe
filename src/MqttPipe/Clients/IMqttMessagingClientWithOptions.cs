@@ -8,6 +8,8 @@ public interface IMqttMessagingClient<in TMessagingClientOptions> where TMessagi
 {
     Task StartAsync();
 
+    Task WaitConnected(Func<Task> connectedHandler);
+
     Task StopAsync();
 
     Task SubscribeAsync(string topic);

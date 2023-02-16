@@ -26,11 +26,37 @@ namespace MqttPipe.Configuration.DependencyInjection
 
             return serviceCollection;
         }
+        
+        public static IServiceCollection AddMqttMessagingClient<TMessagingClientOptions, TClientOptionsBuilder>(
+            this IServiceCollection serviceCollection, 
+            Action<TMessagingClientOptions> configure)
+            where TMessagingClientOptions : class, IMqttMessagingClientOptions, new()
+            where TClientOptionsBuilder: class, IClientOptionsBuilder<TMessagingClientOptions>
+        {
+            serviceCollection.ConfigureMessagingClientOptions(configure);
+
+            serviceCollection.TryAddSingleton<IClientOptionsBuilder<TMessagingClientOptions>, TClientOptionsBuilder>();
+            
+            serviceCollection.TryAddSingleton<IMqttMessagingClient<TMessagingClientOptions>, MqttMessagingClient<TMessagingClientOptions>>();
+            
+            serviceCollection.AddMqttMessagingStartupServices<TMessagingClientOptions>();
+
+            return serviceCollection;
+        }
 
         private static IServiceCollection AddMqttMessagingStartupServices<TMessagingClientOptions>(this IServiceCollection serviceCollection)
             where TMessagingClientOptions : class, IMqttMessagingClientOptions, new()
         {
             serviceCollection.AddHostedService<MqttMessagingHostedService<TMessagingClientOptions>>();
+            return serviceCollection;
+        }
+
+        private static IServiceCollection ConfigureMessagingClientOptions<TMessagingClientOptions>(
+            this IServiceCollection serviceCollection, Action<TMessagingClientOptions> configure)
+            where TMessagingClientOptions : class, IMqttMessagingClientOptions, new()
+        {
+            serviceCollection.Configure(configure);
+            serviceCollection.AddSingleton(sp => sp.GetRequiredService<IOptions<TMessagingClientOptions>>().Value);
             return serviceCollection;
         }
         
@@ -40,6 +66,7 @@ namespace MqttPipe.Configuration.DependencyInjection
             var sectionName = typeof(TMessagingClientOptions).Name;
             var configurationSection = configuration.GetSection(sectionName);
             serviceCollection.Configure<TMessagingClientOptions>(configurationSection);
+            // todo options monitor vs snapshot?? when client is singleton
             serviceCollection.AddSingleton(sp => sp.GetRequiredService<IOptions<TMessagingClientOptions>>().Value);
 
             return serviceCollection;
