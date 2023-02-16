@@ -24,8 +24,11 @@ public class MessageReceivedHandlerTests : IClassFixture<MqttMessageHandlingFixt
         _outputHelper = outputHelper;
     }
 
-    [Fact]
-    public async Task ExecuteAsync_MultiWildCardDeviceTopic_CallHandlerForAllDevices()
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(420)]
+    public async Task ExecuteAsync_MultiWildCardDeviceTopic_CallHandlerForAllDevices(int deviceNumber)
     {
         // Arrange
         var provider = _fixture.ServiceProvider;
@@ -33,14 +36,13 @@ public class MessageReceivedHandlerTests : IClassFixture<MqttMessageHandlingFixt
         const string multiWildCardDeviceTopic = $"{DeviceTopicConstants.DeviceTopic}/#";
         var topicClient = provider.GetRequiredService<ITopicClient<TestMessagingClientOptions>>();
         await topicClient.Subscribe(new SubscriptionDefinition<HandlerForAllDeviceNumbers>(multiWildCardDeviceTopic));
-        
-        var contract =  new DeviceMessageContract { Name = "Device" };
-        var deviceNumber = 1;
+
+        var contract = new DeviceMessageContract { Name = "Device" };
         var publishTopic = $"{DeviceTopicConstants.DeviceTopic}/{deviceNumber}";
 
         // Act
-        var client = _fixture.MessageBus;
-        await client.Publish(contract, publishTopic);
+        var messageBus = _fixture.MessageBus;
+        await messageBus.Publish(contract, publishTopic);
         await Task.Delay(TimeSpan.FromSeconds(5));
         var textWriter = (StringWriter)provider.GetRequiredService<TextWriter>();
         var result = textWriter.GetStringBuilder().ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.None);
