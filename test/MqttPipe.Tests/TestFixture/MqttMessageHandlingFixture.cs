@@ -63,7 +63,7 @@ public class MqttMessageHandlingFixture : IAsyncLifetime
         serviceCollection.AddSingleton<ILoggerFactory, NullLoggerFactory>();
         serviceCollection.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
         
-        serviceCollection.AddMqttPipe<TestMessagingClientOptions, TesClientOptionsBuilder>(options =>
+        serviceCollection.AddMqttPipe<TestMessagingClientOptions, TestClientOptionsBuilder>(options =>
         {
             options.MqttBrokerConnectionOptions.Host = _testContainer.Hostname;
             options.MqttBrokerConnectionOptions.Port = _testContainer.Port;

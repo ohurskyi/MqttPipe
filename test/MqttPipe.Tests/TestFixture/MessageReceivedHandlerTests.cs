@@ -50,4 +50,62 @@ public class MessageReceivedHandlerTests : IClassFixture<MqttMessageHandlingFixt
         // Assert
         Assert.Contains("Device " + nameof(HandlerForAllDeviceNumbers), result);
     }
+    
+    [Fact]
+    public async Task ExecuteAsync_ForDeviceNumberOneTopic_CallsHandlerForDeviceNumber1()
+    {
+        // arrange
+        var provider = _fixture.ServiceProvider;
+        
+        const int deviceNumberOne = 1;
+        const int deviceNumberTwo = 2;
+
+        var topicClient = provider.GetRequiredService<ITopicClient<TestMessagingClientOptions>>();
+        await topicClient.Subscribe(new SubscriptionDefinition<HandlerForDeviceNumber1>($"{DeviceTopicConstants.DeviceTopic}/{deviceNumberOne}"));
+        await topicClient.Subscribe(new SubscriptionDefinition<HandlerForDeviceNumber2>($"{DeviceTopicConstants.DeviceTopic}/{deviceNumberTwo}"));
+
+        var contract = new DeviceMessageContract { Name = "Device" };
+        var publishTopic = $"{DeviceTopicConstants.DeviceTopic}/{deviceNumberOne}";
+
+        // act
+        var messageBus = _fixture.MessageBus;
+        await messageBus.Publish(contract, publishTopic);
+        await Task.Delay(TimeSpan.FromSeconds(5));
+        var textWriter = (StringWriter)provider.GetRequiredService<TextWriter>();
+        var result = textWriter.GetStringBuilder().ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+
+        // assert
+        Assert.Contains("Device " + nameof(HandlerForDeviceNumber1), result);
+        Assert.DoesNotContain("Device " + nameof(HandlerForDeviceNumber2), result);
+    }
+    
+    [Fact]
+    public async Task ExecuteAsync_SingleLevelWildCardDeviceTopic_CallsHandlerForAllDeviceNumbers()
+    {
+        // arrange
+        var provider = _fixture.ServiceProvider;
+
+        const int deviceNumberOne = 1;
+        const int deviceNumberTwo = 2;
+
+        var topicClient = provider.GetRequiredService<ITopicClient<TestMessagingClientOptions>>();
+        await topicClient.Subscribe(new SubscriptionDefinition<HandlerForDeviceNumber1>($"{DeviceTopicConstants.DeviceTopic}/+/temperature/{deviceNumberOne}"));
+        await topicClient.Subscribe(new SubscriptionDefinition<HandlerForDeviceNumber2>($"{DeviceTopicConstants.DeviceTopic}/+/temperature/{deviceNumberTwo}"));
+        await topicClient.Subscribe(new SubscriptionDefinition<HandlerForAllDeviceNumbers>($"{DeviceTopicConstants.DeviceTopic}/+/temperature"));
+
+        var contract = new DeviceMessageContract { Name = "Device" };
+        var publishTopic = $"{DeviceTopicConstants.DeviceTopic}/{deviceNumberOne}/temperature";
+
+        // act
+        var messageBus = _fixture.MessageBus;
+        await messageBus.Publish(contract, publishTopic);
+        await Task.Delay(TimeSpan.FromSeconds(5));
+        var textWriter = (StringWriter)provider.GetRequiredService<TextWriter>();
+        var result = textWriter.GetStringBuilder().ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+
+        // assert
+        Assert.Contains("Device " + nameof(HandlerForAllDeviceNumbers), result);
+        Assert.DoesNotContain("Device " + nameof(HandlerForDeviceNumber1), result);
+        Assert.DoesNotContain("Device " + nameof(HandlerForDeviceNumber2), result);
+    }
 }
