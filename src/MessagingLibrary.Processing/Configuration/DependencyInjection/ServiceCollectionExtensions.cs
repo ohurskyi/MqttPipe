@@ -1,6 +1,5 @@
 ﻿using MessagingLibrary.Core.Configuration;
 using MessagingLibrary.Core.Configuration.DependencyInjection;
-using MessagingLibrary.Core.Handlers;
 using MessagingLibrary.Processing.Executor;
 using MessagingLibrary.Processing.Middlewares;
 using MessagingLibrary.Processing.Strategy;
