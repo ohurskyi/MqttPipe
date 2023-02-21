@@ -18,13 +18,13 @@ public class ConsumerListener<TMessagingClientOptions> : IConsumerListener
 
     public async Task StartListening()
     {
-        var definitions = _consumerDefinitionProvider.Definitions.SelectMany(c => c.Definitions());
-        await Task.WhenAll(definitions.Select(d => _topicClient.Subscribe(d)));
+        var definitions = _consumerDefinitionProvider.Definitions.SelectMany(c => c.Definitions()).ToList();
+        await _topicClient.Subscribe(definitions);
     }
     
     public async Task StopListening()
     {
-        var definitions = _consumerDefinitionProvider.Definitions.SelectMany(c => c.Definitions());
-        await Task.WhenAll(definitions.Select(d => _topicClient.Unsubscribe(d)));
+        var definitions = _consumerDefinitionProvider.Definitions.SelectMany(c => c.Definitions()).ToList();
+        await _topicClient.Unsubscribe(definitions);
     }
 }
