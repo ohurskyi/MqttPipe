@@ -6,22 +6,20 @@ using MessagingLibrary.Core.Definitions.Subscriptions;
 using Microsoft.Extensions.DependencyInjection;
 using MqttPipe.Tests.Contracts;
 using MqttPipe.Tests.Handlers;
+using MqttPipe.Tests.Modules;
 using MqttPipe.Tests.Options;
 using MqttPipe.Tests.Topics;
 using Xunit;
-using Xunit.Abstractions;
 
-namespace MqttPipe.Tests.TestFixture;
+namespace MqttPipe.Tests;
 
-public class MessageReceivedHandlerTests : IClassFixture<MqttMessageHandlingFixture>
+public class MessageReceivedHandlerTests : IClassFixture<MqttFixture>
 {
-    private readonly MqttMessageHandlingFixture _fixture;
-    private readonly ITestOutputHelper _outputHelper;
+    private readonly MqttFixture _fixture;
 
-    public MessageReceivedHandlerTests(MqttMessageHandlingFixture fixture, ITestOutputHelper outputHelper)
+    public MessageReceivedHandlerTests(MqttFixture fixture)
     {
         _fixture = fixture;
-        _outputHelper = outputHelper;
     }
 
     [Theory]

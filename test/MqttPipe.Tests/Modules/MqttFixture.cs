@@ -13,26 +13,25 @@ using MqttPipe.Clients;
 using MqttPipe.Configuration.DependencyInjection;
 using MqttPipe.Services;
 using MqttPipe.Tests.Handlers;
-using MqttPipe.Tests.Modules;
 using MqttPipe.Tests.Options;
 using Xunit;
 
-namespace MqttPipe.Tests.TestFixture;
+namespace MqttPipe.Tests.Modules;
 
-public class MqttMessageHandlingFixture : IAsyncLifetime
+public class MqttFixture : IAsyncLifetime
 {
     private const int Port = 5000;
     private readonly MqttTestConfiguration _testConfiguration = new(Port);
     private readonly MqttTestContainer _testContainer;
 
-    public MqttMessageHandlingFixture()
+    public MqttFixture()
     {
         _testContainer = new TestcontainersBuilder<MqttTestContainer>()
             .WithMessageBroker(_testConfiguration)
             .Build();
     }
 
-    public IMessageBus<TestMessagingClientOptions> MessageBus =>  ServiceProvider.GetRequiredService<IMessageBus<TestMessagingClientOptions>>();
+    public IMessageBus<TestMessagingClientOptions> MessageBus => ServiceProvider.GetRequiredService<IMessageBus<TestMessagingClientOptions>>();
 
     public IServiceProvider ServiceProvider { get; private set; }
 
