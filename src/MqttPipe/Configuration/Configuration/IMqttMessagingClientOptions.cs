@@ -6,4 +6,9 @@ namespace MqttPipe.Configuration.Configuration
     {
         MqttBrokerConnectionOptions MqttBrokerConnectionOptions { get; set; }
     }
+
+    public class BaseMqttMessagingClientOptions : IMqttMessagingClientOptions
+    {
+        public MqttBrokerConnectionOptions MqttBrokerConnectionOptions { get; set; } = new();
+    }
 }
