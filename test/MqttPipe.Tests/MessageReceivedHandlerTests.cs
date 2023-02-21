@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using MessagingLibrary.Core.Clients;
@@ -59,8 +60,11 @@ public class MessageReceivedHandlerTests : IClassFixture<MqttFixture>
         const int deviceNumberTwo = 2;
 
         var topicClient = provider.GetRequiredService<ITopicClient<TestMessagingClientOptions>>();
-        await topicClient.Subscribe(new SubscriptionDefinition<HandlerForDeviceNumber1>($"{DeviceTopicConstants.DeviceTopic}/{deviceNumberOne}"));
-        await topicClient.Subscribe(new SubscriptionDefinition<HandlerForDeviceNumber2>($"{DeviceTopicConstants.DeviceTopic}/{deviceNumberTwo}"));
+        await topicClient.Subscribe(new List<ISubscriptionDefinition>
+        {
+            new SubscriptionDefinition<HandlerForDeviceNumber1>($"{DeviceTopicConstants.DeviceTopic}/{deviceNumberOne}"),
+            new SubscriptionDefinition<HandlerForDeviceNumber2>($"{DeviceTopicConstants.DeviceTopic}/{deviceNumberTwo}")
+        });
 
         var contract = new DeviceMessageContract { Name = "Device" };
         var publishTopic = $"{DeviceTopicConstants.DeviceTopic}/{deviceNumberOne}";
@@ -87,12 +91,15 @@ public class MessageReceivedHandlerTests : IClassFixture<MqttFixture>
         const int deviceNumberTwo = 2;
 
         var topicClient = provider.GetRequiredService<ITopicClient<TestMessagingClientOptions>>();
-        await topicClient.Subscribe(new SubscriptionDefinition<HandlerForDeviceNumber1>($"{DeviceTopicConstants.DeviceTopic}/+/temperature/{deviceNumberOne}"));
-        await topicClient.Subscribe(new SubscriptionDefinition<HandlerForDeviceNumber2>($"{DeviceTopicConstants.DeviceTopic}/+/temperature/{deviceNumberTwo}"));
-        await topicClient.Subscribe(new SubscriptionDefinition<HandlerForAllDeviceNumbers>($"{DeviceTopicConstants.DeviceTopic}/+/temperature"));
+        await topicClient.Subscribe(new List<ISubscriptionDefinition>
+        {
+            new SubscriptionDefinition<HandlerForDeviceNumber1>($"{DeviceTopicConstants.DeviceTopic}/+/temperature/{deviceNumberOne}"),
+            new SubscriptionDefinition<HandlerForDeviceNumber2>($"{DeviceTopicConstants.DeviceTopic}/+/temperature/{deviceNumberTwo}"),
+            new SubscriptionDefinition<HandlerForAllDeviceNumbers>($"{DeviceTopicConstants.DeviceTopic}/+/temperature")
+        });
 
         var contract = new DeviceMessageContract { Name = "Device" };
-        var publishTopic = $"{DeviceTopicConstants.DeviceTopic}/{deviceNumberOne}/temperature";
+        var publishTopic = $"{DeviceTopicConstants.DeviceTopic}/room_1/temperature";
 
         // act
         var messageBus = _fixture.MessageBus;
