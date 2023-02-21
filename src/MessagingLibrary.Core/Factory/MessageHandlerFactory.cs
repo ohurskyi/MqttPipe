@@ -22,16 +22,6 @@ public class MessageHandlerFactory<TMessagingClientOptions> : IMessageHandlerFac
         return AddInner(handlerType, topic);
     }
 
-    public int RegisterHandler<THandler>(string topic) where THandler : class, IMessageHandler
-    {
-        return AddInner(typeof(THandler), topic);
-    }
-
-    public int RemoveHandler<THandler>(string topic) where THandler : class, IMessageHandler
-    {
-        return RemoveInner(typeof(THandler), topic);
-    }
-
     public int RemoveHandler(Type handlerType, string topic)
     {
         return RemoveInner(handlerType, topic);
