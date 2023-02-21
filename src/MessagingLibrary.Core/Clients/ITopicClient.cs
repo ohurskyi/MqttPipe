@@ -6,5 +6,7 @@ namespace MessagingLibrary.Core.Clients;
 public interface ITopicClient<TMessagingClientOptions> where TMessagingClientOptions : IMessagingClientOptions
 {
     Task Subscribe(ISubscriptionDefinition definition);
-    Task Unsubscribe(ISubscriptionDefinition subscriptionDefinition);
+    Task Subscribe(IEnumerable<ISubscriptionDefinition> definitions);
+    Task Unsubscribe(ISubscriptionDefinition definition);
+    Task Unsubscribe(IEnumerable<ISubscriptionDefinition> definitions);
 }
