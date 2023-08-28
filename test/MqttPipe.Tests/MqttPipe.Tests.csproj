@@ -32,4 +32,6 @@
       <ProjectReference Include="..\..\src\MessagingLibrary.Processing\MessagingLibrary.Processing.csproj" />
     </ItemGroup>
 
+
+
 </Project>
