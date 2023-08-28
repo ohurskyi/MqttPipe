@@ -2,7 +2,10 @@
 
 namespace MqttPipe.Infrastructure;
 
-public class InfrastructureClientOptions : IMqttMessagingClientOptions
+public class InfrastructureClientOptions : BaseMqttMessagingClientOptions
 {
-    public MqttBrokerConnectionOptions MqttBrokerConnectionOptions { get; set; } = new() { Host = "localhost", Port = 1883 };
+    public InfrastructureClientOptions()
+    {
+        MqttBrokerConnectionOptions = new() { Host = "localhost", Port = 1883 };
+    }
 }

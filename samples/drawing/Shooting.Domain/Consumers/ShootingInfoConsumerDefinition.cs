@@ -1,6 +1,5 @@
 ﻿using MessagingLibrary.Core.Definitions.Consumers;
 using MessagingLibrary.Core.Definitions.Subscriptions;
-using Shooting.Contracts;
 using Shooting.Contracts.Topics;
 using Shooting.Domain.Handlers.GetTargetLayers;
 using Shooting.Domain.Handlers.ShootingInfo;
@@ -18,7 +17,7 @@ public class ShootingInfoConsumerDefinition : IConsumerDefinition
             new SubscriptionDefinition<CreateInfoLayerMessageHandler>($"{ShootingTopicConstants.ShootingInfoTopic}"),
             new SubscriptionDefinition<RecordShootingSessionStartedMessageHandler>($"{ShootingTopicConstants.ShootingInfoTopic}"),
             
-            new SubscriptionDefinition<GetTargetLayersMessageHandler>($"{ShootingTopicConstants.ShootingInfoRequest}")
+            new SubscriptionDefinition<GetTargetLayersMessageHandler>($"{ShootingTopicConstants.ShootingInfoRequest}"),
         };
     }
 }

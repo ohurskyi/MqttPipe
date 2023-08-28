@@ -1,5 +1,7 @@
 ﻿using MessagingLibrary.Core.Clients;
 using MessagingLibrary.Core.Configuration;
+using MessagingLibrary.Core.Contexts;
+using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
 using MessagingLibrary.Processing.Middlewares;
@@ -7,27 +9,33 @@ using Microsoft.Extensions.Logging;
 
 namespace MqttPipe.Middlewares;
 
-public class PublishMiddleware<TMessagingClientOptions> : IMessageMiddleware<TMessagingClientOptions>  
-    where TMessagingClientOptions : IMessagingClientOptions
+public class PublishMiddleware<T, V> : IMessageMiddleware<T, V> 
+    where T : class, IMessageContract
+    where V: class, IMessagingClientOptions
 {
-    private readonly ILogger<PublishMiddleware<TMessagingClientOptions>> _logger;
-    private readonly IMessageBus<TMessagingClientOptions> _messageBus;
+    private readonly ILogger<PublishMiddleware<T, V>> _logger;
+    private readonly ServiceFactory _serviceFactory;
 
-    public PublishMiddleware(ILogger<PublishMiddleware<TMessagingClientOptions>> logger, IMessageBus<TMessagingClientOptions> messageBus)
+    public PublishMiddleware(ILogger<PublishMiddleware<T, V>> logger, ServiceFactory serviceFactory)
     {
         _logger = logger;
-        _messageBus = messageBus;
+        _serviceFactory = serviceFactory;
     }
 
-    public async Task<HandlerResult> Handle(IMessage message, MessageHandlerDelegate next)
+    public async Task<HandlerResult> Handle(MessagingContext<T> context, V messagingClientOptions, MessageHandlerDelegate<T, V> next)
     {
-        var result = await next();
+        var result = await next(context, messagingClientOptions);
         var integrationEvents = result.ExecutionResults.OfType<IntegrationEventResult>().ToList();
-        var publishTasks = new List<Task>(integrationEvents.Count);
+        var integrationEventsCount = integrationEvents.Count;
+        if (integrationEventsCount <= 0) return result;
+        
+        var publishTasks = new List<Task>(integrationEventsCount);
+        var messageBus = _serviceFactory.GetInstance<IMessageBus<V>>();
+        
         foreach (var integrationEvent in integrationEvents)
         {
             _logger.LogDebug("Publishing integration event into topic {topicValue} of payload {type}", integrationEvent.Topic, integrationEvent.Contract.GetType().Name);
-            publishTasks.Add(_messageBus.Publish(integrationEvent.Contract, integrationEvent.Topic));
+            publishTasks.Add(messageBus.Publish(integrationEvent.Contract, integrationEvent.Topic));
         }
 
         await Task.WhenAll(publishTasks);

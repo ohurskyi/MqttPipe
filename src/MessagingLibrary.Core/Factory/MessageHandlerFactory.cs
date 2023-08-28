@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using MessagingLibrary.Core.Configuration;
 using MessagingLibrary.Core.Handlers;
+using MessagingLibrary.Core.Messages;
 
 namespace MessagingLibrary.Core.Factory;
 
@@ -21,28 +22,18 @@ public class MessageHandlerFactory<TMessagingClientOptions> : IMessageHandlerFac
         return AddInner(handlerType, topic);
     }
 
-    public int RegisterHandler<THandler>(string topic) where THandler : class, IMessageHandler
-    {
-        return AddInner(typeof(THandler), topic);
-    }
-
-    public int RemoveHandler<THandler>(string topic) where THandler : class, IMessageHandler
-    {
-        return RemoveInner(typeof(THandler), topic);
-    }
-
     public int RemoveHandler(Type handlerType, string topic)
     {
         return RemoveInner(handlerType, topic);
     }
 
-    public IEnumerable<IMessageHandler> GetHandlers(string topic, ServiceFactory serviceFactory)
+    public IEnumerable<IMessageHandler<T>> GetHandlers<T>(string topic, ServiceFactory serviceFactory) where T : class, IMessageContract
     {
         var instances = _handlersMap
             .Where(k => _topicFilterComparer.IsMatch(topic, k.Key))
             .SelectMany(k => k.Value.Keys)
-            .Select(serviceFactory.GetInstance<IMessageHandler>);
-
+            .Select(serviceFactory.GetInstance<IMessageHandler<T>>)
+            .ToList();
         return instances;
     }
 
@@ -50,7 +41,9 @@ public class MessageHandlerFactory<TMessagingClientOptions> : IMessageHandlerFac
     {
         if (!_handlersMap.TryGetValue(topic, out var handlers))
         {
-            _handlersMap.TryAdd(topic, new ConcurrentDictionary<Type, byte>(new[] { new KeyValuePair<Type, byte>(handlerType, default) }));
+            Interlocked.Exchange(ref handlers, new ConcurrentDictionary<Type, byte>());
+            handlers.TryAdd(handlerType, default);
+            _handlersMap.TryAdd(topic, handlers);
             return 1;
         }
 

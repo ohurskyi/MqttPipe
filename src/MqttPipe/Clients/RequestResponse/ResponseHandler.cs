@@ -1,29 +1,29 @@
-﻿using MessagingLibrary.Core.Handlers;
+﻿using MessagingLibrary.Core.Contexts;
+using MessagingLibrary.Core.Handlers;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
-using MqttPipe.Clients.RequestResponse.Completion;
 
-namespace MqttPipe.Clients.RequestResponse.Handlers;
+namespace MqttPipe.Clients.RequestResponse;
 
-public class ResponseHandler : IMessageHandler
+public class ResponseHandler<T> : IMessageHandler<T> where T: class, IMessageResponse
 {
-    private readonly PendingResponseTracker _pendingResponseTracker;
+    private readonly PendingResponseTracker<T> _pendingResponseTracker;
 
-    public ResponseHandler(PendingResponseTracker pendingResponseTracker)
+    public ResponseHandler(PendingResponseTracker<T> pendingResponseTracker)
     {
         _pendingResponseTracker = pendingResponseTracker;
     }
 
-    public async Task<IExecutionResult> Handle(IMessage message)
+    public async Task<IExecutionResult> HandleAsync(MessagingContext<T> messagingContext)
     {
-        var taskCompletionSource = _pendingResponseTracker.GetCompletion(message.CorrelationId);
+        var taskCompletionSource = _pendingResponseTracker.GetCompletion(messagingContext.CorrelationId);
 
         if (taskCompletionSource == null)
         {
-            return await Task.FromResult(FailedResult.Create($"Cannot complete the response. Non existing correlation id {message.CorrelationId}"));
+            return await Task.FromResult(FailedResult.Create($"Cannot complete the response. Non existing correlation id {messagingContext.CorrelationId}"));
         }
 
-        taskCompletionSource.SetResult(message.Payload);
+        taskCompletionSource.TrySetResult(messagingContext.Message);
             
         return await Task.FromResult(new SuccessfulResult());
     }

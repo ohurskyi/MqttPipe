@@ -1,4 +1,6 @@
 using MediatR;
+using MessagingLibrary.Core.Contexts;
+using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Handlers;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
@@ -9,7 +11,7 @@ using Shooting.Domain.Events.ShootingStartedEvent;
 
 namespace Shooting.Domain.Handlers.ShootingInfo;
 
-public class RecordShootingSessionStartedMessageHandler :  MessageHandlerBase<ShootingInfoContract> 
+public class RecordShootingSessionStartedMessageHandler :  IMessageHandler<ShootingInfoContract> 
 {
     private readonly ILogger<RecordShootingSessionStartedMessageHandler> _logger;
     private readonly IMediator _mediator;
@@ -20,9 +22,9 @@ public class RecordShootingSessionStartedMessageHandler :  MessageHandlerBase<Sh
         _logger = logger;
     }
 
-    protected override async Task<IExecutionResult> HandleAsync(MessagingContext<ShootingInfoContract> messagingContext)
+    public async Task<IExecutionResult> HandleAsync(MessagingContext<ShootingInfoContract> messagingContext)
     {
-        var payload = messagingContext.Payload;
+        var payload = messagingContext.Message;
         _logger.LogInformation("Shooting started on Lane {laneNumber}",  payload.LaneNumber);
         await _mediator.Publish(new ShootingStartedEvent(payload.LaneNumber));
         return new SuccessfulResult();

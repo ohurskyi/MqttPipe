@@ -2,14 +2,15 @@
 using DistributedConfiguration.Contracts.Pairing;
 using DistributedConfiguration.Contracts.Topics;
 using DistributedConfiguration.Domain.Infrastructure;
+using MessagingLibrary.Core.Contexts;
+using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Handlers;
-using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
 using Microsoft.Extensions.Logging;
 
 namespace DistributedConfiguration.Domain.Handlers;
 
-public class PairDeviceMessageHandler : MessageHandlerBase<PairDeviceContract>
+public class PairDeviceMessageHandler : IMessageHandler<PairDeviceContract>
 {
     private readonly ILogger<PairDeviceMessageHandler> _logger;
 
@@ -21,9 +22,9 @@ public class PairDeviceMessageHandler : MessageHandlerBase<PairDeviceContract>
         _devicesStorage = devicesStorage;
     }
 
-    protected override async Task<IExecutionResult> HandleAsync(MessagingContext<PairDeviceContract> messagingContext)
+    public async Task<IExecutionResult> HandleAsync(MessagingContext<PairDeviceContract> messagingContext)
     {
-        var payload = messagingContext.Payload;
+        var payload = messagingContext.Message;
         
         if (_devicesStorage.Exists(payload.MacAddress))
         {

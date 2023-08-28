@@ -1,5 +1,7 @@
 ﻿using MessagingLibrary.Processing.Configuration.DependencyInjection;
+using MessagingLibrary.Processing.Middlewares;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using MqttPipe.Configuration.Configuration;
 using MqttPipe.Middlewares;
 
@@ -12,18 +14,22 @@ public static class MessagingPipelineServiceCollectionExtensions
     {
         return serviceCollection
             .AddMessagingPipeline<TMessagingClientOptions>()
+            .AddMiddlewares()
             .AddMqttTopicComparer()
-            .AddInternalMiddlewares<TMessagingClientOptions>()
             .AddMqttApplicationMessageReceivedHandler<TMessagingClientOptions>();
     }
 
-    private static IServiceCollection AddInternalMiddlewares<TMessagingClientOptions>(this IServiceCollection serviceCollection)
-        where TMessagingClientOptions : class, IMqttMessagingClientOptions
+    private static IServiceCollection AddMiddlewares(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddMiddleware<UnhandledExceptionMiddleware<TMessagingClientOptions>, TMessagingClientOptions>();
-        serviceCollection.AddMiddleware<LoggingMiddleware<TMessagingClientOptions>, TMessagingClientOptions>();
-        serviceCollection.AddMiddleware<PublishMiddleware<TMessagingClientOptions>, TMessagingClientOptions>();
-        serviceCollection.AddMiddleware<ReplyMiddleware<TMessagingClientOptions>, TMessagingClientOptions>();
+        serviceCollection.TryAddEnumerable(new[]
+        {
+            ServiceDescriptor.Transient(typeof(IMessageMiddleware<,>), typeof(UnhandledExceptionMiddleware<,>)),
+            ServiceDescriptor.Transient(typeof(IMessageMiddleware<,>), typeof(LoggingMiddleware<,>)),
+            ServiceDescriptor.Transient(typeof(IMessageMiddleware<,>), typeof(PerformanceMiddleware<,>)),
+            ServiceDescriptor.Transient(typeof(IMessageMiddleware<,>), typeof(PublishMiddleware<,>)),
+            ServiceDescriptor.Transient(typeof(IMessageMiddleware<,>), typeof(ReplyMiddleware<,>)),
+        });
+
         return serviceCollection;
     }
 }

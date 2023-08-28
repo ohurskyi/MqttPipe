@@ -2,7 +2,6 @@
 
 namespace MqttPipe.Tests.Options;
 
-public class TestMessagingClientOptions : IMqttMessagingClientOptions
+public class TestMessagingClientOptions : BaseMqttMessagingClientOptions
 {
-    public MqttBrokerConnectionOptions MqttBrokerConnectionOptions { get; set; }
 }

@@ -21,9 +21,25 @@ public class MqttTopicClient<TMessagingClientOptions> : ITopicClient<TMessagingC
         await SubscribeInner(subscriptionDefinition);
     }
 
-    public async Task Unsubscribe(ISubscriptionDefinition subscriptionDefinition)
+    public async Task Subscribe(IEnumerable<ISubscriptionDefinition> definitions)
     {
-        await UnsubscribeInner(subscriptionDefinition);
+        foreach (var definition in definitions)
+        {
+            await Subscribe(definition);
+        }
+    }
+
+    public async Task Unsubscribe(ISubscriptionDefinition definition)
+    {
+        await UnsubscribeInner(definition);
+    }
+
+    public async Task Unsubscribe(IEnumerable<ISubscriptionDefinition> definitions)
+    {
+        foreach (var definition in definitions)
+        {
+            await Unsubscribe(definition);
+        }
     }
 
     private async Task UnsubscribeInner(ISubscriptionDefinition subscriptionDefinition)

@@ -22,7 +22,6 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddMediatR(typeof(IncrementActivateLanesCountEventHandler));
 
         serviceCollection.AddDomainInfrastructure();
-            
         return serviceCollection;
     }
 

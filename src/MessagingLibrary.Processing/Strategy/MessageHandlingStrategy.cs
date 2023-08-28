@@ -1,67 +1,45 @@
-﻿using MessagingLibrary.Core.Configuration;
+using MessagingLibrary.Core.Configuration;
+using MessagingLibrary.Core.Contexts;
 using MessagingLibrary.Core.Factory;
 using MessagingLibrary.Core.Handlers;
 using MessagingLibrary.Core.Messages;
 using MessagingLibrary.Core.Results;
-using MessagingLibrary.Processing.Middlewares;
 
 namespace MessagingLibrary.Processing.Strategy;
 
-public class MessageHandlingStrategy<TMessagingClientOptions> : IMessageHandlingStrategy<TMessagingClientOptions>
-    where TMessagingClientOptions: IMessagingClientOptions
+public class MessageHandlingStrategy<T, V> 
+    where T : class, IMessageContract
+    where V: class, IMessagingClientOptions
 {
-    private readonly IMessageHandlerFactory<TMessagingClientOptions> _messageHandlerFactory;
     private readonly ServiceFactory _serviceFactory;
 
-    public MessageHandlingStrategy(
-        IMessageHandlerFactory<TMessagingClientOptions> messageHandlerFactory, 
-        ServiceFactory serviceFactory)
+    public MessageHandlingStrategy(ServiceFactory serviceFactory)
     {
-        _messageHandlerFactory = messageHandlerFactory;
         _serviceFactory = serviceFactory;
     }
 
-    public async Task<HandlerResult> Handle(IMessage message)
+    public async Task<HandlerResult> HandleAsync(MessagingContext<T> messagingContext, V messagingClientOptions)
     {
-        var handlers = _messageHandlerFactory.GetHandlers(message.Topic, _serviceFactory);
+        var factory = _serviceFactory.GetInstance<IMessageHandlerFactory<V>>();
+        
+        var handlers = factory.GetHandlers<T>(messagingContext.Topic, _serviceFactory);
 
-        Task<HandlerResult> HandlerFunc() => HandleInner(handlers, message);
-
-        var messageHandlerDelegate = _serviceFactory
-            .GetInstances<IMessageMiddleware<TMessagingClientOptions>>()
-            .Reverse()
-            .Aggregate((MessageHandlerDelegate)HandlerFunc, 
-                (next, pipeline) => () => pipeline.Handle(message, next));
-
-        var handlerResult = await messageHandlerDelegate();
+        var handlerResult = await HandleCore(messagingContext, handlers);
 
         return handlerResult;
     }
 
-    private async Task<HandlerResult> HandleInner(IEnumerable<IMessageHandler> handlers, IMessage message)
-    {
-        var executionResults = await HandleCore(handlers, message);
-
-        var handlerResult = new HandlerResult();
-
-        foreach (var executionResult in executionResults)
-        {
-            handlerResult.AddResult(executionResult);
-        }
-
-        return handlerResult;
-    }
-
-    protected virtual async Task<IEnumerable<IExecutionResult>> HandleCore(IEnumerable<IMessageHandler> handlers, IMessage message)
+    private async Task<HandlerResult> HandleCore(MessagingContext<T> messagingContext, IEnumerable<IMessageHandler<T>> handlers)
     {
         var executionResults = new List<IExecutionResult>();
-
         foreach (var handler in handlers)
         {
-            var result = await handler.Handle(message);
+            var result = await handler.HandleAsync(messagingContext);
             executionResults.Add(result);
         }
 
-        return executionResults;
+        var handlerResult = new HandlerResult();
+        handlerResult.AddResults(executionResults);
+        return handlerResult;
     }
 }

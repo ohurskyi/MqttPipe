@@ -1,5 +1,6 @@
 ﻿using DistributedConfiguration.Client.Consumers;
 using DistributedConfiguration.Client.IntegrationEvents.PairedDevicesConfigurationChanged;
+using DistributedConfiguration.Contracts.Pairing;
 using MessagingLibrary.Core.Configuration.DependencyInjection;
 using MessagingLibrary.Processing.Configuration.DependencyInjection;
 

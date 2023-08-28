@@ -27,7 +27,22 @@ public class MqttMessagingClient<TMessagingClientOptions> : IMqttMessagingClient
     {
         await _mqttClient.StartAsync(_mqttClientOptions);
     }
-        
+
+    public Task Connect()
+    {
+        TaskCompletionSource tcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        _mqttClient.ConnectedAsync += Func;
+        return tcs.Task;
+
+        Task Func(MqttClientConnectedEventArgs args)
+        {
+            _mqttClient.ConnectedAsync -= Func;
+            tcs.TrySetResult();
+            return Task.CompletedTask;
+        }
+    }
+
     public async Task StopAsync()
     {
         await _mqttClient.StopAsync();

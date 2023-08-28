@@ -2,7 +2,7 @@
 
 namespace MqttPipe.Shooting;
 
-public class ShootingClientOptions : IMqttMessagingClientOptions
+public class ShootingClientOptions : BaseMqttMessagingClientOptions
 {
-    public MqttBrokerConnectionOptions MqttBrokerConnectionOptions { get; set; } = new();
+   
 }

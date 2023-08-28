@@ -16,7 +16,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddMessageConsumersHostedService();
 
         services.AddHostedService<BackgroundPublisher>();
-        // services.AddHostedService<BackgroundRequestSender>();
+        //services.AddHostedService<BackgroundRequestSender>();
     })
     .UseSerilog((hostingContext, _, loggerConfiguration) => loggerConfiguration
         .ReadFrom.Configuration(hostingContext.Configuration)
