@@ -6,14 +6,28 @@ Message processing is done using [MessagingLibrary Core](https://github.com/ohur
 Core/Processing has no dependencies. Integration with MQTT done in separate proj [MqttPipe](https://github.com/ohurskyi/MQTT/tree/main/src/MqttPipe).
 
 ## Define messaging options
-each client should have its own implementation of ```IMqttMessagingClientOptions```
+each new client configuration starts from deriving from ```BaseMqttMessagingClientOptions```
 ```csharp
-public class InfrastructureClientOptions : IMqttMessagingClientOptions
+public class InfrastructureClientOptions : BaseMqttMessagingClientOptions
 {
-    public MqttBrokerConnectionOptions MqttBrokerConnectionOptions { get; set; } = new() { Host = "infrastructure.dev.com", Port = 1883 };
+    public InfrastructureClientOptions()
+    {
+        MqttBrokerConnectionOptions = new() { Host = "localhost", Port = 1883 };
+    }
 }
 ```
-and derive from ```ClientOptionsBuilder<T>```, in our case ```T is InfrastructureClientOptions```
+
+you can also override values in ```appsettings.json```
+```json
+"InfrastructureClientOptions": {
+    "MqttBrokerConnectionOptions": {
+      "Host": "infrastructure.dev.com",
+      "Port": "9001"
+    }
+  }
+```
+
+and from ```ClientOptionsBuilder<T>```, in our case ```T is InfrastructureClientOptions```
 ```csharp
 public class InfrastructureClientOptionsBuilder : ClientOptionsBuilder<InfrastructureClientOptions>
 {
@@ -100,7 +114,8 @@ public class ConsumerDefinitionProvider : IConsumerDefinitionProvider
     };
 }
 ```
-create listener, then subscriptions will be created on startup and removed on tear down of the host.
+create listener, that maps subscriptions aggregated in ```ConsumerDefinitionProvider``` to the specific client (```InfrastructureClientOptions```)
+subscriptions will be created on ``startup`` and removed on ``teardown`` of the host.
 ```csharp
 public class ConsumerDefinitionListenerProvider : IConsumerDefinitionListenerProvider
 {
